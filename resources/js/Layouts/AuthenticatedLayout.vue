@@ -1,29 +1,89 @@
 <script setup>
-import { ref } from "vue";
-import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
+import AdminLayout from "./SidebarLayout.vue";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 
-const showingNavigationDropdown = ref(false);
+const page = usePage();
+const isOpen = ref(false);
+const isMinimized = ref(false);
+
+// --- Layout Toggle Logic ---
+const toggleSidebar = () => {
+    if (window.innerWidth >= 1024) {
+        isMinimized.value = !isMinimized.value;
+    } else {
+        isOpen.value = !isOpen.value;
+    }
+};
+const handleResize = () => {
+    if (window.innerWidth >= 1024) {
+        isOpen.value = true;
+    }
+};
+onMounted(() => {
+    window.addEventListener("resize", handleResize);
+});
+onUnmounted(() => {
+    window.removeEventListener("resize", handleResize);
+});
+
+const isNotCustomer = computed(() => {
+    return (
+        Array.isArray(page.props.auth.roles) &&
+        !page.props.auth.roles.includes("Customer")
+    );
+});
 </script>
 
 <template>
     <div>
         <div class="min-h-screen bg-gray-100">
-            <nav class="border-b border-gray-100 bg-white">
+            <nav class="border-b border-gray-200 bg-white">
                 <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-full">
                     <div class="flex h-16 justify-between">
                         <div class="flex">
                             <!-- Logo -->
+                            <div
+                                class="flex items-center w-20 bg-cyan-800"
+                                v-if="$page?.props?.auth?.roles != 'Customer'"
+                            >
+                                <button
+                                    @click="toggleSidebar"
+                                    class="text-cyan-100 hover:text-cyan-100 focus:outline-none mx-auto"
+                                >
+                                    <svg
+                                        xmlns="www.w3.org"
+                                        class="w-6 h-6 text-cyan-100 hover:text-cyan-100"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            v-if="!isOpen || isMinimized"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M4 6h16M4 12h16m-7 6h7"
+                                        />
+                                        <path
+                                            v-if="isOpen && !isMinimized"
+                                            class="hidden lg:block"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M15 19l-7-7 7-7"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
                             <div class="flex shrink-0 items-center">
                                 <Link :href="route('dashboard')">
-                                    <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
-                                    />
+                                    <ApplicationLogo />
                                 </Link>
                             </div>
 
@@ -31,21 +91,6 @@ const showingNavigationDropdown = ref(false);
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
                             >
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Dashboard
-                                </NavLink>
-
-                                <NavLink
-                                    v-if="$page?.props?.auth?.roles == 'Admin'"
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Admin Dashboard
-                                </NavLink>
-
                                 <NavLink
                                     v-if="
                                         $page?.props?.auth?.roles == 'Customer'
@@ -55,27 +100,14 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Customer Dashboard
                                 </NavLink>
+                            </div>
 
-                                <NavLink
-                                    v-if="
-                                        $page?.props?.auth?.roles == 'Organizer'
-                                    "
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Organizer Dashboard
-                                </NavLink>
-
-                                <NavLink
-                                    v-if="
-                                        $page?.props?.auth?.roles ==
-                                        'Event Manager'
-                                    "
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Event Manager
-                                </NavLink>
+                            <div v-if="$page?.props?.auth?.roles != 'Customer'">
+                                <AdminLayout
+                                    :isOpen="isOpen"
+                                    :isMinimized="isMinimized"
+                                    @toggle="isOpen = !isOpen"
+                                />
                             </div>
                         </div>
 
@@ -124,105 +156,29 @@ const showingNavigationDropdown = ref(false);
                                 </Dropdown>
                             </div>
                         </div>
-
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
-                >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div class="border-t border-gray-200 pb-1 pt-4">
-                        <div class="px-4">
-                            <div class="text-base font-medium text-gray-800">
-                                {{ $page.props.auth.user.name }}
-                            </div>
-                            <div class="text-sm font-medium text-gray-500">
-                                {{ $page.props.auth.user.email }}
-                            </div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
                     </div>
                 </div>
             </nav>
 
-            <!-- Page Heading -->
-            <header class="bg-white shadow" v-if="$slots.header">
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
-                </div>
-            </header>
+            <div
+                :class="{
+                    'lg:pl-64': isNotCustomer && !isMinimized,
+                    'lg:pl-20': isNotCustomer && isMinimized,
+                }"
+                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
+            >
+                <!-- Page Heading -->
+                <header class="bg-white shadow" v-if="$slots.header">
+                    <div class="mx-auto max-w-full px-4 py-6 sm:px-6 lg:px-8">
+                        <slot name="header" />
+                    </div>
+                </header>
 
-            <!-- Page Content -->
-            <main>
-                <slot />
-            </main>
+                <!-- Page Content -->
+                <main>
+                    <slot />
+                </main>
+            </div>
         </div>
     </div>
 </template>

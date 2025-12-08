@@ -23,14 +23,11 @@ const toggleDropdown = (name) => {
 const isLinkActive = (routeName) => route().current(routeName);
 
 const menuRouteMap = {
-    userManagement: ["admin.users", "admin.user.create", "admin.user.edit"],
-    teamsRoles: ["admin.team.index", "admin.role.index"],
-    workflow: ["admin.workflow.index", "admin.workflow.create"],
-    settings: [
-        "admin.settings.general",
-        "admin.settings.email",
-        "admin.settings.security",
+    categories: [
+        "admin.event-categories.index",
+        "admin.event-categories.create",
     ],
+    events: ["admin.events.index", "admin.events.create"],
 };
 
 const autoOpenDropdown = () => {
@@ -107,6 +104,72 @@ autoOpenDropdown();
                 <!-- === EVENTS MANAGEMENT === -->
                 <div v-if="hasRole('Admin')">
                     <a
+                        @click.prevent="toggleDropdown('categories')"
+                        href="#"
+                        class="flex items-center p-3 rounded-lg transition duration-150 group cursor-pointer text-sm"
+                        :class="{
+                            'bg-cyan-700 text-white':
+                                openDropdownName === 'categories',
+                            'text-cyan-800 hover:bg-cyan-700 hover:text-white':
+                                openDropdownName !== 'categories',
+                        }"
+                    >
+                        <Icon name="category" class="w-5 h-5" />
+                        <span v-if="!isMinimized" class="ml-3 flex-1 truncate"
+                            >Event Category</span
+                        >
+                        <Icon
+                            v-if="!isMinimized"
+                            :name="
+                                openDropdownName === 'categories'
+                                    ? 'chevronUp'
+                                    : 'chevronDown'
+                            "
+                            class="w-4 h-4 ml-auto"
+                        />
+                    </a>
+
+                    <div
+                        :class="{
+                            'max-h-96 opacity-100':
+                                openDropdownName === 'categories',
+                            'max-h-0 opacity-0':
+                                openDropdownName !== 'categories' ||
+                                isMinimized,
+                        }"
+                        class="overflow-hidden transition-all duration-300 ease-in-out pl-4"
+                    >
+                        <Link
+                            :href="route('admin.event-categories.index')"
+                            :class="{
+                                'bg-cyan-700 text-white': isLinkActive(
+                                    'admin.event-categories.index'
+                                ),
+                            }"
+                            class="flex items-center p-3 text-sm mt-2 rounded-lg hover:bg-cyan-700 hover:text-white"
+                        >
+                            <Icon name="list" class="w-4 h-4 mr-2" /> All
+                            Categories
+                        </Link>
+
+                        <Link
+                            :href="route('admin.event-categories.create')"
+                            :class="{
+                                'bg-cyan-700 text-white': isLinkActive(
+                                    'admin.event-categories.create'
+                                ),
+                            }"
+                            class="flex items-center p-3 text-sm my-2 rounded-lg hover:bg-cyan-700 hover:text-white"
+                        >
+                            <Icon name="create" class="w-5 h-5 mr-1" /> Create
+                            Category
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- === EVENTS MANAGEMENT === -->
+                <div v-if="hasRole('Admin')">
+                    <a
                         @click.prevent="toggleDropdown('events')"
                         href="#"
                         class="flex items-center p-3 rounded-lg transition duration-150 group cursor-pointer text-sm"
@@ -175,7 +238,7 @@ autoOpenDropdown();
                         'bg-cyan-700 text-white':
                             isLinkActive('admin.venues.index'),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm text-cyan-800 rounded-lg hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="location" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -192,7 +255,7 @@ autoOpenDropdown();
                             'admin.ticket-types.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="ticket" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -209,7 +272,7 @@ autoOpenDropdown();
                             'admin.bookings.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="list" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -226,7 +289,7 @@ autoOpenDropdown();
                             'admin.payments.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="billing" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -243,7 +306,7 @@ autoOpenDropdown();
                             'admin.refunds.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="refund" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -259,7 +322,7 @@ autoOpenDropdown();
                         'bg-cyan-700 text-white':
                             isLinkActive('admin.users.index'),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="users" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate">Users</span>
@@ -273,7 +336,7 @@ autoOpenDropdown();
                         'bg-cyan-700 text-white':
                             isLinkActive('admin.staff.index'),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="teamRole" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate">Staff</span>
@@ -288,7 +351,7 @@ autoOpenDropdown();
                             'admin.reports.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="report" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -305,7 +368,7 @@ autoOpenDropdown();
                             'admin.settings.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="cog" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -326,7 +389,7 @@ autoOpenDropdown();
                             'manager.events.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="calendar" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -343,7 +406,7 @@ autoOpenDropdown();
                             'manager.venues.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="location" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -360,7 +423,7 @@ autoOpenDropdown();
                             'manager.ticket-types.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="ticket" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -377,7 +440,7 @@ autoOpenDropdown();
                             'manager.bookings.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="list" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
@@ -394,7 +457,7 @@ autoOpenDropdown();
                             'manager.reports.index'
                         ),
                     }"
-                    class="flex items-center p-3 text-sm rounded-lg hover:bg-cyan-700 hover:text-white"
+                    class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
                     <Icon name="report" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"

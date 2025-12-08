@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\AdminPaymentController;
 use App\Http\Controllers\Admin\AdminRefundController;
@@ -62,6 +63,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Admin'])->grou
 
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
 
+    Route::resource('event-categories', AdminCategoryController::class);
     Route::resource('events', AdminEventController::class);
     Route::resource('venues', AdminVenueController::class);
     Route::resource('ticket-types', AdminTicketTypeController::class);

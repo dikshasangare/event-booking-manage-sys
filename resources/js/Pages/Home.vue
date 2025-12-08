@@ -102,7 +102,7 @@ const events = ref([
         </div>
 
         <!-- Categories Section -->
-        <section class="py-16 my-10 px-6 max-w-7xl mx-auto">
+        <section class="py-16 mt-10 px-6 max-w-7xl mx-auto">
             <h2 class="text-3xl font-bold mb-6 text-cyan-700">
                 Popular Categories
             </h2>
@@ -157,10 +157,13 @@ const events = ref([
         <!-- ========================= -->
         <!-- Featured Events -->
         <!-- ========================= -->
-        <section class="py-16 px-6 max-w-7xl mx-auto">
-            <h2 class="text-3xl font-bold mb-8">Featured Events</h2>
+        <section class="pb-16 px-6 max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold mb-6 text-cyan-700">
+                Featured Events
+            </h2>
+            <hr />
 
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-3 gap-8 mt-10">
                 <div
                     v-for="event in events"
                     :key="event.title"

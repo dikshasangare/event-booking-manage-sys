@@ -42,7 +42,9 @@ const isNotCustomer = computed(() => {
 <template>
     <div>
         <div class="min-h-screen bg-gray-100">
-            <nav class="border-b border-gray-200 bg-white">
+            <nav
+                class="border-b border-gray-200 bg-white fixed top-0 left-0 w-full z-50"
+            >
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-full">
                     <div class="flex h-16 justify-between">
@@ -165,7 +167,7 @@ const isNotCustomer = computed(() => {
                     'lg:pl-64': isNotCustomer && !isMinimized,
                     'lg:pl-20': isNotCustomer && isMinimized,
                 }"
-                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
+                class="flex-1 pt-16 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
             >
                 <!-- Page Heading -->
                 <header class="bg-white shadow" v-if="$slots.header">

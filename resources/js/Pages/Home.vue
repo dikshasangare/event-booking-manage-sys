@@ -41,6 +41,27 @@ const events = ref([
         image: "https://picsum.photos/600/400?random=3",
     },
 ]);
+
+const steps = ref([
+    {
+        title: "Browse Events",
+        description:
+            "Search concerts, shows, sports, conferences & more with smart filters.",
+        icon: "search",
+    },
+    {
+        title: "Choose Tickets",
+        description:
+            "Select seat categories, VIP packages or passes that best suit your needs.",
+        icon: "TicketIcon",
+    },
+    {
+        title: "Confirm Booking",
+        description:
+            "Make secure payments & instantly receive your digital/QR ticket.",
+        icon: "ConfirmIcon",
+    },
+]);
 </script>
 
 <template>
@@ -188,61 +209,124 @@ const events = ref([
             </div>
         </section>
 
-        <!-- ========================= -->
-        <!-- Footer -->
-        <!-- ========================= -->
-        <footer class="bg-gray-900 text-gray-300 py-10 mt-20">
-            <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-10">
-                <div>
-                    <h4 class="text-xl font-bold text-white mb-3">Eventify</h4>
-                    <p>
-                        Your trusted platform to find and book the best events.
+        <section class="relative py-24 bg-gray-950 overflow-hidden">
+            <!-- Background glow blobs -->
+            <div
+                class="absolute -top-32 -left-32 w-[28rem] h-[28rem] bg-cyan-500/30 rounded-full blur-3xl"
+            ></div>
+            <div
+                class="absolute top-40 -right-40 w-[28rem] h-[28rem] bg-teal-500/30 rounded-full blur-3xl"
+            ></div>
+
+            <div class="relative max-w-7xl mx-auto px-6">
+                <!-- Section Title -->
+                <div class="text-center mb-20">
+                    <h2
+                        class="text-5xl font-extrabold bg-gradient-to-r from-cyan-400 to-teal-500 bg-clip-text text-transparent"
+                    >
+                        Book Your Event in 3 Simple Steps
+                    </h2>
+                    <p class="text-gray-400 mt-4 text-lg max-w-xl mx-auto">
+                        A smooth and effortless booking journey crafted with a
+                        premium experience.
                     </p>
                 </div>
 
-                <div>
-                    <h4 class="font-semibold text-white mb-3">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="hover:text-white">Events</a></li>
-                        <li><a href="#" class="hover:text-white">About</a></li>
-                        <li>
-                            <a href="#" class="hover:text-white">Contact</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-semibold text-white mb-3">Support</h4>
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="#" class="hover:text-white">Help Center</a>
-                        </li>
-                        <li><a href="#" class="hover:text-white">FAQs</a></li>
-                        <li>
-                            <a href="#" class="hover:text-white"
-                                >Terms & Policies</a
-                            >
-                        </li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-semibold text-white mb-3">Newsletter</h4>
-                    <input
-                        type="email"
-                        placeholder="Enter your email"
-                        class="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-gray-700 focus:ring-2 focus:ring-cyan-500"
-                    />
-                    <button
-                        class="w-full mt-3 bg-cyan-600 text-white py-2 rounded-lg hover:bg-cyan-700 transition"
+                <!-- Stepper Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-14 pt-10">
+                    <div
+                        v-for="(step, index) in steps"
+                        :key="step.title"
+                        class="relative flex flex-col items-center text-center group"
                     >
-                        Subscribe
+                        <!-- Connector Arrow -->
+                        <div
+                            v-if="index !== steps.length - 1"
+                            class="hidden md:block absolute right-[-60px] top-1/2 transform -translate-y-1/2"
+                        >
+                            <svg
+                                class="w-10 h-10 text-cyan-400 opacity-80 animate-bounce-x"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4 12h16m-6 6l6-6-6-6"
+                                />
+                            </svg>
+                        </div>
+
+                        <!-- Neon Icon Box -->
+                        <div class="relative mb-8">
+                            <!-- Glow Ring -->
+                            <div
+                                class="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-600 to-teal-600 blur-xl opacity-40 group-hover:opacity-70 transition-all duration-500"
+                            ></div>
+
+                            <!-- Icon Circle -->
+                            <div
+                                class="relative w-24 h-24 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 flex items-center justify-center shadow-lg shadow-cyan-500/30 transition-all duration-300 group-hover:scale-105 group-hover:shadow-cyan-600/40"
+                            >
+                                <Icon
+                                    :name="step.icon"
+                                    class="w-12 h-12 text-cyan-400"
+                                />
+                                <!-- <Icon :is="step.icon" class="w-12 h-12 text-cyan-400" /> -->
+                            </div>
+                        </div>
+
+                        <!-- Step label -->
+                        <span
+                            class="text-sm font-semibold text-cyan-400 tracking-widest mb-2"
+                        >
+                            STEP {{ index + 1 }}
+                        </span>
+
+                        <!-- Title -->
+                        <h3 class="text-2xl font-bold text-white mb-3">
+                            {{ step.title }}
+                        </h3>
+
+                        <!-- Description -->
+                        <p class="text-gray-400 max-w-xs leading-relaxed">
+                            {{ step.description }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-32 text-center">
+                    <button
+                        class="relative px-12 py-4 bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 text-white font-bold text-lg rounded-full shadow-xl overflow-hidden transform transition-all duration-500 hover:scale-105 hover:rotate-1"
+                    >
+                        <!-- Glow ring behind button -->
+                        <span
+                            class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-teal-500 to-cyan-600 blur-2xl opacity-50 animate-pulse"
+                        ></span>
+
+                        <!-- Button text on top -->
+                        <span class="relative z-10">Book Now</span>
                     </button>
                 </div>
             </div>
-            <p class="text-center mt-10 text-gray-500 text-sm">
-                © 2025 Eventify. All Rights Reserved.
-            </p>
-        </footer>
+        </section>
     </CustomerLayout>
 </template>
+
+<style>
+/* Horizontal Arrow Animation */
+@keyframes bounce-x {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(8px);
+    }
+}
+.animate-bounce-x {
+    animation: bounce-x 1.2s infinite ease-in-out;
+}
+</style>

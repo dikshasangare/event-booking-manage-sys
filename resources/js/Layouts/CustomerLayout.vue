@@ -51,7 +51,8 @@ onUnmounted(() => {
                     <!-- Logo -->
                     <div class="flex items-center">
                         <Link :href="'/'">
-                            <ApplicationLogo class="text-3xl"
+                            <ApplicationLogo
+                                class="text-3xl"
                                 :class="
                                     isScrolled
                                         ? 'hover:text-cyan-800'
@@ -142,7 +143,7 @@ onUnmounted(() => {
                         <Dropdown align="right" width="48">
                             <template #trigger>
                                 <button
-                                    class="inline-flex items-center rounded-md px-3 py-2 text-sm "
+                                    class="inline-flex items-center rounded-md px-3 py-2 text-sm"
                                     :class="
                                         isScrolled
                                             ? 'hover:text-cyan-800'
@@ -347,5 +348,62 @@ onUnmounted(() => {
         <main>
             <slot />
         </main>
+
+        <!-- ========================= -->
+        <!-- Footer -->
+        <!-- ========================= -->
+        <footer class="bg-gray-900 text-gray-300 py-10 mt-10">
+            <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-10">
+                <div>
+                    <h4 class="text-xl font-bold text-white mb-3">Eventify</h4>
+                    <p>
+                        Your trusted platform to find and book the best events.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white mb-3">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white">Events</a></li>
+                        <li><a href="#" class="hover:text-white">About</a></li>
+                        <li>
+                            <a href="#" class="hover:text-white">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white mb-3">Support</h4>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" class="hover:text-white">Help Center</a>
+                        </li>
+                        <li><a href="#" class="hover:text-white">FAQs</a></li>
+                        <li>
+                            <a href="#" class="hover:text-white"
+                                >Terms & Policies</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white mb-3">Newsletter</h4>
+                    <input
+                        type="email"
+                        placeholder="Enter your email"
+                        class="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-gray-700 focus:ring-2 focus:ring-cyan-500"
+                    />
+                    <button
+                        class="w-full mt-3 bg-cyan-600 text-white py-2 rounded-lg hover:bg-cyan-700 transition"
+                    >
+                        Subscribe
+                    </button>
+                </div>
+            </div>
+            <p class="text-center mt-10 text-gray-500 text-sm">
+                © 2025 Eventify. All Rights Reserved.
+            </p>
+        </footer>
     </div>
 </template>

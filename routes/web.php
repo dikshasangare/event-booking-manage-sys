@@ -36,11 +36,11 @@ Route::get('/dashboard', function () {
 
 
 Route::get('/events', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Customer/Events');
 })->name('events');
 
 Route::get('/categories', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Customer/Category');
 })->name('categories');
 
 Route::get('/my-tickets', function () {

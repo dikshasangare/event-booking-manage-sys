@@ -1,32 +1,35 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router, useForm, usePage } from "@inertiajs/vue3";
-
 import Icon from "@/Components/Icon.vue";
 
 const backToBtn = () => {
-    router.visit("/admin/event-categories");
+    router.visit("/admin/venues");
 };
 
 const props = defineProps({
-    category: Object,
+    venue: Object,
     errors: Object,
 });
 
-const isEdit = !!props.category;
+const isEdit = !!props.venue;
 
 const form = useForm({
     _method: isEdit ? "PUT" : "POST",
-    name: props.category?.name ?? "",
-    status: props.category?.status ?? "",
-    description: props.category?.short_description ?? "",
-    categoryPhoto: null,
+    name: props.venue?.name ?? "",
+    status: props.venue?.is_active ?? "",
+    city: props.venue?.city ?? "",
+    state: props.venue?.state ?? "",
+    country: props.venue?.country ?? "",
+    capacity: props.venue?.capacity ?? "",
+    address: props.venue?.address ?? "",
+    venuePhoto: null,
 });
 
 function submit() {
     const url = isEdit
-        ? route("admin.event-categories.update", props.category.id)
-        : route("admin.event-categories.store");
+        ? route("admin.venues.update", props.venue.id)
+        : route("admin.venues.store");
 
     form.post(url, {
         forceFormData: true,
@@ -35,8 +38,7 @@ function submit() {
 </script>
 
 <template>
-    <Head :title="isEdit ? 'Edit Category' : 'Create Category'" />
-
+    <Head :title="isEdit ? 'Edit Venue' : 'Create Venue'" />
     <AuthenticatedLayout>
         <template #header>
             <div class="flex justify-between">
@@ -44,17 +46,17 @@ function submit() {
                     <h2
                         class="text-xl font-semibold leading-tight text-gray-800"
                     >
-                        {{ isEdit ? "Edit" : "Create" }} Event Categories
+                        {{ isEdit ? "Edit" : "Create" }} Event Venues
                     </h2>
                 </div>
                 <div>
                     <button
                         type="button"
                         @click="backToBtn()"
-                        class="bg-cyan-700 hover:bg-cyan-500 text-cyan-50 font-normal text-xs py-2 px-4 rounded-full"
+                        class="bg-cyan-700 hover:bg-cyan-500 text-xs text-cyan-50 font-normal py-2 px-4 rounded-full"
                     >
                         <Icon name="backarrow" class="h-4 w-4 inline-block" />
-                        Back to Event Category
+                        Back to Venues
                     </button>
                 </div>
             </div>
@@ -70,15 +72,13 @@ function submit() {
                             <div class="md:w-1/2 px-3 mb-6 md:mb-0">
                                 <label
                                     class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
-                                    for="grid-first-name"
                                 >
-                                    Name
+                                    Venue Name
                                 </label>
                                 <input
                                     class="appearance-none block w-full bg-grey-lighter text-gray-700 border border-cyan-700 focus:ring-cyan-500 rounded py-3 px-4 mb-3"
-                                    id="grid-first-name"
                                     type="text"
-                                    placeholder="Jane"
+                                    placeholder="Enter venue name"
                                     v-model="form.name"
                                 />
                                 <div
@@ -88,10 +88,10 @@ function submit() {
                                     {{ errors.name }}
                                 </div>
                             </div>
+
                             <div class="md:w-1/2 px-3 mb-6 md:mb-0">
                                 <label
                                     class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
-                                    for="grid-first-name"
                                 >
                                     Status
                                 </label>
@@ -114,26 +114,88 @@ function submit() {
                             </div>
                         </div>
 
+                        <!-- City, State, Country (Single Row) -->
+                        <div class="-mx-3 grid grid-cols-1 md:grid-cols-3 mb-6">
+                            <div class="px-3 mb-6 md:mb-0">
+                                <label
+                                    class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+                                >
+                                    City
+                                </label>
+                                <input
+                                    class="appearance-none block w-full bg-grey-lighter text-gray-700 border border-cyan-700 focus:ring-cyan-500 rounded py-3 px-4 mb-3"
+                                    type="text"
+                                    placeholder="City"
+                                    v-model="form.city"
+                                />
+                                <div
+                                    class="text-red-500 font-bold text-sm italic"
+                                    v-if="errors.city"
+                                >
+                                    {{ errors.city }}
+                                </div>
+                            </div>
+
+                            <div class="px-3 mb-6 md:mb-0">
+                                <label
+                                    class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+                                >
+                                    State
+                                </label>
+                                <input
+                                    class="appearance-none block w-full bg-grey-lighter text-gray-700 border border-cyan-700 focus:ring-cyan-500 rounded py-3 px-4 mb-3"
+                                    type="text"
+                                    placeholder="State"
+                                    v-model="form.state"
+                                />
+                                <div
+                                    class="text-red-500 font-bold text-sm italic"
+                                    v-if="errors.state"
+                                >
+                                    {{ errors.state }}
+                                </div>
+                            </div>
+
+                            <div class="px-3 mb-6 md:mb-0">
+                                <label
+                                    class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+                                >
+                                    Country
+                                </label>
+                                <input
+                                    class="appearance-none block w-full bg-grey-lighter text-gray-700 border border-cyan-700 focus:ring-cyan-500 rounded py-3 px-4 mb-3"
+                                    type="text"
+                                    placeholder="Country"
+                                    v-model="form.country"
+                                />
+                                <div
+                                    class="text-red-500 font-bold text-sm italic"
+                                    v-if="errors.country"
+                                >
+                                    {{ errors.country }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Capacity -->
                         <div class="-mx-3 md:flex mb-6">
                             <div class="md:w-1/2 px-3 mb-6 md:mb-0">
                                 <label
                                     class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
-                                    for="grid-description"
                                 >
-                                    Description
+                                    Capacity
                                 </label>
-
-                                <textarea
+                                <input
+                                    type="number"
                                     class="appearance-none block w-full bg-grey-lighter text-gray-700 border border-cyan-700 focus:ring-cyan-500 rounded py-3 px-4 mb-3"
-                                    id="grid-description"
-                                    placeholder="Say something..."
-                                    v-model="form.description"
-                                ></textarea>
+                                    placeholder="Max capacity"
+                                    v-model="form.capacity"
+                                />
                                 <div
                                     class="text-red-500 font-bold text-sm italic"
-                                    v-if="errors.description"
+                                    v-if="errors.capacity"
                                 >
-                                    {{ errors.description }}
+                                    {{ errors.capacity }}
                                 </div>
                             </div>
                             <div class="md:w-1/2 px-3 mb-6 md:mb-0">
@@ -141,7 +203,7 @@ function submit() {
                                     class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
                                     for="grid-first-name"
                                 >
-                                    Category Photo
+                                    Venue Photo
                                 </label>
                                 <input
                                     class="focus:outline-none w-full py-3 mb-3"
@@ -150,19 +212,42 @@ function submit() {
                                     accept="image/*"
                                     @change="
                                         (e) =>
-                                            (form.categoryPhoto =
+                                            (form.venuePhoto =
                                                 e.target.files[0])
                                     "
                                 />
                                 <div
                                     class="text-red-500 font-bold text-sm italic"
-                                    v-if="errors.categoryPhoto"
+                                    v-if="errors.venuePhoto"
                                 >
-                                    {{ errors.categoryPhoto }}
+                                    {{ errors.venuePhoto }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="-mx-3 mb-6">
+                            <div class="md:w-full px-3 mb-6 md:mb-0">
+                                <label
+                                    class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
+                                >
+                                    Address
+                                </label>
+                                <textarea
+                                    class="appearance-none block w-full bg-grey-lighter text-gray-700 border border-cyan-700 focus:ring-cyan-500 rounded py-3 px-4 mb-3"
+                                    placeholder="Full venue address"
+                                    v-model="form.address"
+                                ></textarea>
+                                <div
+                                    class="text-red-500 font-bold text-sm italic"
+                                    v-if="errors.address"
+                                >
+                                    {{ errors.address }}
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!-- Submit Button -->
                     <div
                         class="flex justify-end border-t-2 py-10 px-8 border-gray-200"
                     >
@@ -170,7 +255,7 @@ function submit() {
                             type="submit"
                             class="hover:shadow-form rounded-md bg-cyan-600 py-3 px-8 text-base font-semibold text-white outline-none"
                         >
-                            {{ isEdit ? "Update Category" : "Save Category" }}
+                            {{ isEdit ? "Update Venue" : "Save Venue" }}
                         </button>
                     </div>
                 </form>

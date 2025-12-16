@@ -20,7 +20,13 @@ const toggleDropdown = (name) => {
     openDropdownName.value = openDropdownName.value === name ? null : name;
 };
 
-const isLinkActive = (routeName) => route().current(routeName);
+// const isLinkActive = (routeName) => route().current(routeName);
+const isLinkActive = (routeNames) => {
+    if (Array.isArray(routeNames)) {
+        return routeNames.some((name) => route().current(name));
+    }
+    return route().current(routeNames);
+};
 
 const menuRouteMap = {
     categories: [
@@ -28,6 +34,7 @@ const menuRouteMap = {
         "admin.event-categories.create",
     ],
     events: ["admin.events.index", "admin.events.create"],
+    venues: ["admin.venues.index", "admin.venues.create"],
 };
 
 const autoOpenDropdown = () => {
@@ -235,8 +242,12 @@ autoOpenDropdown();
                     v-if="hasRole('Admin')"
                     :href="route('admin.venues.index')"
                     :class="{
-                        'bg-cyan-700 text-white':
-                            isLinkActive('admin.venues.index'),
+                        'bg-cyan-700 text-white': isLinkActive([
+                            'admin.venues.index',
+                            'admin.venues.create',
+                            'admin.venues.edit',
+                            'admin.venues.show',
+                        ]),
                     }"
                     class="flex items-center p-3 text-sm text-cyan-800 rounded-lg hover:bg-cyan-700 hover:text-white"
                 >
@@ -252,7 +263,10 @@ autoOpenDropdown();
                     :href="route('admin.ticket-types.index')"
                     :class="{
                         'bg-cyan-700 text-white': isLinkActive(
-                            'admin.ticket-types.index'
+                            'admin.ticket-types.index',
+                            'admin.ticket-types.create',
+                            'admin.ticket-types.edit',
+                            'admin.ticket-types.show'
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
@@ -269,7 +283,10 @@ autoOpenDropdown();
                     :href="route('admin.bookings.index')"
                     :class="{
                         'bg-cyan-700 text-white': isLinkActive(
-                            'admin.bookings.index'
+                            'admin.bookings.index',
+                            'admin.bookings.create',
+                            'admin.bookings.edit',
+                            'admin.bookings.show'
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
@@ -286,7 +303,10 @@ autoOpenDropdown();
                     :href="route('admin.payments.index')"
                     :class="{
                         'bg-cyan-700 text-white': isLinkActive(
-                            'admin.payments.index'
+                            'admin.payments.index',
+                            'admin.payments.create',
+                            'admin.payments.edit',
+                            'admin.payments.show'
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
@@ -303,7 +323,10 @@ autoOpenDropdown();
                     :href="route('admin.refunds.index')"
                     :class="{
                         'bg-cyan-700 text-white': isLinkActive(
-                            'admin.refunds.index'
+                            'admin.refunds.index',
+                            'admin.refunds.create',
+                            'admin.refunds.edit',
+                            'admin.refunds.show'
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
@@ -319,8 +342,12 @@ autoOpenDropdown();
                     v-if="hasRole('Admin')"
                     :href="route('admin.users.index')"
                     :class="{
-                        'bg-cyan-700 text-white':
-                            isLinkActive('admin.users.index'),
+                        'bg-cyan-700 text-white': isLinkActive(
+                            'admin.users.index',
+                            'admin.users.create',
+                            'admin.users.edit',
+                            'admin.users.show'
+                        ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
@@ -333,8 +360,12 @@ autoOpenDropdown();
                     v-if="hasRole('Admin')"
                     :href="route('admin.staff.index')"
                     :class="{
-                        'bg-cyan-700 text-white':
-                            isLinkActive('admin.staff.index'),
+                        'bg-cyan-700 text-white': isLinkActive(
+                            'admin.staff.index',
+                            'admin.staff.create',
+                            'admin.staff.edit',
+                            'admin.staff.show'
+                        ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
@@ -348,7 +379,10 @@ autoOpenDropdown();
                     :href="route('admin.reports.index')"
                     :class="{
                         'bg-cyan-700 text-white': isLinkActive(
-                            'admin.reports.index'
+                            'admin.reports.index',
+                            'admin.reports.create',
+                            'admin.reports.edit',
+                            'admin.reports.show'
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
@@ -365,7 +399,10 @@ autoOpenDropdown();
                     :href="route('admin.settings.index')"
                     :class="{
                         'bg-cyan-700 text-white': isLinkActive(
-                            'admin.settings.index'
+                            'admin.settings.index',
+                            'admin.settings.create',
+                            'admin.settings.edit',
+                            'admin.settings.show'
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
@@ -386,7 +423,10 @@ autoOpenDropdown();
                     :href="route('manager.events.index')"
                     :class="{
                         'bg-cyan-700 text-white': isLinkActive(
-                            'manager.events.index'
+                            'manager.events.index',
+                            'manager.events.create',
+                            'manager.events.edit',
+                            'manager.events.show',
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"

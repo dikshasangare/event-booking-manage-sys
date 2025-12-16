@@ -5,21 +5,21 @@ import { ref, watch } from "vue";
 import Icon from "@/Components/Icon.vue";
 
 const props = defineProps({
-    categories: Object,
+    venues: Object,
 });
 
-const categoryCreate = () => {
-    router.visit("/admin/event-categories/create");
+const venueCreate = () => {
+    router.visit("/admin/venues/create");
 };
 
-const userSearch = ref(props.filters?.userSearch || "");
+const venueSearch = ref(props.filters?.venueSearch || "");
 let timeout = null;
-watch(userSearch, (value) => {
+watch(venueSearch, (value) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
         router.get(
-            "/admin/users",
-            { userSearch: value },
+            "/admin/venues",
+            { venueSearch: value },
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -29,50 +29,46 @@ watch(userSearch, (value) => {
     }, 400);
 });
 
-const categoryIdBeingDeleted = ref(null);
+const venueIdBeingDeleted = ref(null);
 const showDeleteModal = ref(false);
-
 const showViewDetailModal = ref(false);
-const selectedCategory = ref(null);
+const selectedVenue = ref(null);
 
-const confirmCategoryDelete = (id) => {
-    categoryIdBeingDeleted.value = id;
+const confirmVenueDeletion = (id) => {
+    venueIdBeingDeleted.value = id;
     showDeleteModal.value = true;
+};
+
+const confirmVenueShow = (venue) => {
+    selectedVenue.value = venue;
+    showViewDetailModal.value = true;
 };
 
 const closeDeleteModal = () => {
     showDeleteModal.value = false;
-    categoryIdBeingDeleted.value = null;
-};
-
-const confirmCategoryShow = (category) => {
-    selectedCategory.value = category;
-    showViewDetailModal.value = true;
+    venueIdBeingDeleted.value = null;
 };
 
 const closeViewDetailModal = () => {
     showViewDetailModal.value = false;
-    selectedCategory.value = null;
+    selectedVenue.value = null;
 };
 
-const deleteCategory = () => {
-    router.delete(
-        route("admin.event-categories.destroy", categoryIdBeingDeleted.value),
-        {
-            onSuccess: () => {
-                closeDeleteModal();
-            },
-        }
-    );
+const deleteVenue = () => {
+    router.delete(route("admin.venues.destroy", venueIdBeingDeleted.value), {
+        onSuccess: () => {
+            closeDeleteModal();
+        },
+    });
 };
 
-const editCategory = (id) => {
-    router.visit(route("admin.event-categories.edit", id));
+const editVenue = (id) => {
+    router.visit(route("admin.venues.edit", id));
 };
 </script>
 
 <template>
-    <Head title="Categories" />
+    <Head title="Venues" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -81,17 +77,17 @@ const editCategory = (id) => {
                     <h2
                         class="text-xl font-semibold leading-tight text-gray-800"
                     >
-                        Event Categories
+                        Event Venues
                     </h2>
                 </div>
                 <div>
                     <button
                         type="button"
-                        @click="categoryCreate()"
-                        class="bg-cyan-700 hover:bg-cyan-500 text-cyan-50 font-normal text-xs py-2 px-4 rounded-full"
+                        @click="venueCreate()"
+                        class="bg-cyan-700 hover:bg-cyan-500 text-cyan-50 text-xs font-normal py-2 px-4 rounded-full"
                     >
                         <Icon name="create" class="h-4 w-4 inline-block" />
-                        Add Category
+                        Add Venue
                     </button>
                 </div>
             </div>
@@ -136,7 +132,7 @@ const editCategory = (id) => {
                             type="text"
                             placeholder="Search"
                             class="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                            v-model="userSearch"
+                            v-model="venueSearch"
                         />
                     </div>
                 </div>
@@ -161,22 +157,44 @@ const editCategory = (id) => {
                                                 <button
                                                     class="flex items-center gap-x-3 focus:outline-none"
                                                 >
-                                                    <span>Category Name</span>
+                                                    <span>Venue Name</span>
                                                 </button>
                                             </th>
-
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
+                                            >
+                                                City
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
+                                            >
+                                                State
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
+                                            >
+                                                Country
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
+                                            >
+                                                Capacity
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
+                                            >
+                                                Address
+                                            </th>
                                             <th
                                                 scope="col"
                                                 class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
                                             >
                                                 Status
-                                            </th>
-
-                                            <th
-                                                scope="col"
-                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
-                                            >
-                                                Description
                                             </th>
                                             <th
                                                 scope="col"
@@ -188,8 +206,8 @@ const editCategory = (id) => {
                                         class="bg-white divide-y divide-gray-200"
                                     >
                                         <tr
-                                            v-for="category in categories.data"
-                                            :key="category.id"
+                                            v-for="venue in venues.data"
+                                            :key="venue.id"
                                         >
                                             <td
                                                 class="px-4 py-4 text-sm font-medium whitespace-nowrap"
@@ -199,8 +217,8 @@ const editCategory = (id) => {
                                                 >
                                                     <img
                                                         :src="
-                                                            category.event_logo
-                                                                ? `/storage/${category.event_logo}`
+                                                            venue.venue_image
+                                                                ? `/storage/${venue.venue_image}`
                                                                 : '/images/default-avatar.png'
                                                         "
                                                         alt="User Photo"
@@ -210,29 +228,73 @@ const editCategory = (id) => {
                                                         <h2
                                                             class="font-semibold text-gray-800"
                                                         >
-                                                            {{ category.name }}
+                                                            {{ venue.name }}
                                                         </h2>
+                                                        <p
+                                                            class="font-medium text-xs text-gray-500"
+                                                        >
+                                                            {{ venue.slug }}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </td>
-
                                             <td
-                                                class="px-4 py-4 text-sm whitespace-nowrap"
+                                                class="px-4 py-4 text-xs whitespace-nowrap"
+                                            >
+                                                <p class="text-gray-500">
+                                                    {{ venue.city }}
+                                                </p>
+                                            </td>
+                                            <td
+                                                class="px-4 py-4 text-xs whitespace-nowrap"
+                                            >
+                                                <p class="text-gray-500">
+                                                    {{ venue.state }}
+                                                </p>
+                                            </td>
+                                            <td
+                                                class="px-4 py-4 text-xs whitespace-nowrap"
+                                            >
+                                                <p class="text-gray-500">
+                                                    {{ venue.country }}
+                                                </p>
+                                            </td>
+                                            <td
+                                                class="px-4 py-4 text-xs whitespace-nowrap"
+                                            >
+                                                <p class="text-gray-500">
+                                                    {{ venue.capacity }}
+                                                </p>
+                                            </td>
+                                            <td
+                                                class="px-4 py-4 text-xs whitespace-nowrap"
+                                            >
+                                                <p class="text-gray-500">
+                                                    {{
+                                                        venue.address
+                                                            ?.split(" ")
+                                                            .slice(0, 2)
+                                                            .join(" ")
+                                                    }}...
+                                                </p>
+                                            </td>
+                                            <td
+                                                class="px-4 py-4 text-xs whitespace-nowrap"
                                             >
                                                 <div>
                                                     <span
                                                         class="capitalize px-1.5 py-1 rounded text-xs mr-1"
                                                         :class="{
                                                             'bg-green-700 text-white':
-                                                                category.status ===
+                                                                venue.is_active ===
                                                                 '1',
                                                             ' bg-red-700 text-white':
-                                                                category.status !==
+                                                                venue.is_active !==
                                                                 '1',
                                                         }"
                                                     >
                                                         {{
-                                                            category.status ===
+                                                            venue.is_active ===
                                                             "1"
                                                                 ? "Active"
                                                                 : "Inactive"
@@ -241,31 +303,16 @@ const editCategory = (id) => {
                                                 </div>
                                             </td>
                                             <td
-                                                class="px-4 py-4 text-sm whitespace-nowrap"
-                                            >
-                                                <p class="text-gray-500">
-                                                    {{
-                                                        category.short_description
-                                                            ?.split(" ")
-                                                            .slice(0, 4)
-                                                            .join(" ")
-                                                    }}...
-                                                </p>
-                                            </td>
-
-                                            <td
-                                                class="text-sm whitespace-nowrap"
+                                                class="text-xs whitespace-nowrap"
                                             >
                                                 <div
                                                     class="flex items-center gap-1"
                                                 >
                                                     <button
-                                                        @click="
-                                                            editCategory(
-                                                                category.id
-                                                            )
-                                                        "
                                                         type="button"
+                                                        @click="
+                                                            editVenue(venue.id)
+                                                        "
                                                         class="inline-flex items-center gap-1 bg-blue-700 hover:bg-blue-500 text-blue-50 font-normal text-xs py-1 px-2 rounded-full"
                                                     >
                                                         <Icon
@@ -275,12 +322,12 @@ const editCategory = (id) => {
                                                         <span>Edit</span>
                                                     </button>
                                                     <button
+                                                        type="button"
                                                         @click="
-                                                            confirmCategoryShow(
-                                                                category
+                                                            confirmVenueShow(
+                                                                venue
                                                             )
                                                         "
-                                                        type="button"
                                                         class="inline-flex items-center gap-1 bg-blue-700 hover:bg-blue-500 text-blue-50 font-normal text-xs py-1 px-2 rounded-full"
                                                     >
                                                         <Icon
@@ -290,12 +337,12 @@ const editCategory = (id) => {
                                                         <span>View</span>
                                                     </button>
                                                     <button
+                                                        type="button"
                                                         @click="
-                                                            confirmCategoryDelete(
-                                                                category.id
+                                                            confirmVenueDeletion(
+                                                                venue.id
                                                             )
                                                         "
-                                                        type="button"
                                                         class="inline-flex items-center gap-1 bg-red-700 hover:bg-red-500 text-red-50 font-normal text-xs py-1 px-2 rounded-full"
                                                     >
                                                         <Icon
@@ -308,9 +355,9 @@ const editCategory = (id) => {
                                             </td>
                                         </tr>
                                         <!-- When no data exists -->
-                                        <tr v-if="categories.data.length === 0">
+                                        <tr v-if="venues.data.length === 0">
                                             <td
-                                                colspan="4"
+                                                colspan="8"
                                                 class="text-center py-4 text-gray-500"
                                             >
                                                 No record found
@@ -328,8 +375,8 @@ const editCategory = (id) => {
                     <div class="text-sm text-gray-500">
                         Page
                         <span class="font-medium text-gray-700">
-                            {{ categories.current_page }} of
-                            {{ categories.last_page }}
+                            {{ venues.current_page }} of
+                            {{ venues.last_page }}
                         </span>
                     </div>
 
@@ -340,12 +387,12 @@ const editCategory = (id) => {
                             class="flex items-center justify-center px-3 py-2 text-sm bg-white border rounded-md gap-x-2 hover:bg-gray-100"
                             :class="{
                                 'text-gray-400 cursor-not-allowed':
-                                    !categories.prev_page_url,
+                                    !venues.prev_page_url,
                             }"
-                            :disabled="!categories.prev_page_url"
+                            :disabled="!venues.prev_page_url"
                             @click="
-                                categories.prev_page_url &&
-                                    router.visit(categories.prev_page_url)
+                                venues.prev_page_url &&
+                                    router.visit(venues.prev_page_url)
                             "
                         >
                             <svg
@@ -367,7 +414,7 @@ const editCategory = (id) => {
 
                         <!-- Number Buttons -->
                         <template
-                            v-for="link in categories.links"
+                            v-for="link in venues.links"
                             :key="link.label"
                         >
                             <button
@@ -392,12 +439,12 @@ const editCategory = (id) => {
                             class="flex items-center justify-center px-3 py-2 text-sm bg-white border rounded-md gap-x-2 hover:bg-gray-100"
                             :class="{
                                 'text-gray-400 cursor-not-allowed':
-                                    !categories.next_page_url,
+                                    !venues.next_page_url,
                             }"
-                            :disabled="!categories.next_page_url"
+                            :disabled="!venues.next_page_url"
                             @click="
-                                categories.next_page_url &&
-                                    router.visit(categories.next_page_url)
+                                venues.next_page_url &&
+                                    router.visit(venues.next_page_url)
                             "
                         >
                             <span>Next</span>
@@ -422,7 +469,7 @@ const editCategory = (id) => {
         </div>
     </AuthenticatedLayout>
 
-    <!-- view category modal -->
+    <!-- view venue modal -->
     <div
         v-if="showViewDetailModal"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
@@ -430,14 +477,14 @@ const editCategory = (id) => {
         <div
             class="relative bg-white w-11/12 md:max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
         >
-            <div class="relative h-48 md:h-64">
+            <div class="relative h-48 md:h-56">
                 <img
                     :src="
-                        selectedCategory.event_logo
-                            ? `/storage/${selectedCategory.event_logo}`
+                        selectedVenue.venue_image
+                            ? `/storage/${selectedVenue.venue_image}`
                             : '/images/default-avatar.png'
                     "
-                    class="absolute inset-0 w-full h-full"
+                    class="absolute inset-0 w-full h-full object-cover"
                 />
                 <div
                     class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
@@ -468,28 +515,86 @@ const editCategory = (id) => {
 
                 <div class="absolute bottom-4 left-6 text-white">
                     <h2 class="text-2xl font-bold tracking-wide">
-                        {{ selectedCategory.name }}
+                        {{ selectedVenue.name }}
                     </h2>
+                    <p class="text-sm text-white/80">
+                        {{ selectedVenue.slug }}
+                    </p>
                 </div>
             </div>
 
-            <div class="px-6 py-3 space-y-5">
+            <div class="px-6 py-3 space-y-3">
                 <div class="flex flex-wrap items-center justify-between">
                     <span
                         class="inline-block px-3 py-1 rounded-full text-xs font-medium"
                         :class="{
                             'bg-green-600 text-white':
-                                selectedCategory.status === '1',
+                                selectedVenue.is_active === '1',
                             'bg-red-600 text-white':
-                                selectedCategory.status !== '1',
+                                selectedVenue.is_active !== '1',
                         }"
                     >
                         {{
-                            selectedCategory.status === "1"
-                                ? "Active Category"
-                                : "Inactive Category"
+                            selectedVenue.is_active === "1"
+                                ? "Active Venue"
+                                : "Inactive Venue"
                         }}
                     </span>
+
+                    <div class="flex gap-3">
+                        <div
+                            class="px-4 py-2 rounded-xl text-center bg-gradient-to-br from-cyan-50 to-white border"
+                        >
+                            <p class="text-xs text-cyan-600">Capacity</p>
+                            <p
+                                class="font-normal text-sm text-gray-800 leading-relaxed"
+                            >
+                                {{ selectedVenue.capacity }}
+                            </p>
+                        </div>
+                        <div
+                            class="bg-gradient-to-br from-cyan-50 to-white border px-4 py-2 rounded-xl text-center"
+                        >
+                            <p class="text-xs text-cyan-600">Country</p>
+                            <p
+                                class="font-normal text-sm text-gray-800 leading-relaxed"
+                            >
+                                {{ selectedVenue.country }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div
+                        class="py-3 rounded-2xl text-center bg-gradient-to-br from-gray-50 to-white border"
+                    >
+                        <p
+                            class="text-xs uppercase tracking-wide text-gray-400"
+                        >
+                            City
+                        </p>
+                        <p
+                            class="text-md font-normal text-gray-800 leading-relaxed"
+                        >
+                            {{ selectedVenue.city }}
+                        </p>
+                    </div>
+
+                    <div
+                        class="py-3 rounded-2xl text-center bg-gradient-to-br from-gray-50 to-white border"
+                    >
+                        <p
+                            class="text-xs uppercase tracking-wide text-gray-400"
+                        >
+                            State
+                        </p>
+                        <p
+                            class="text-md font-normal text-gray-800 leading-relaxed"
+                        >
+                            {{ selectedVenue.state }}
+                        </p>
+                    </div>
                 </div>
 
                 <div
@@ -498,10 +603,10 @@ const editCategory = (id) => {
                     <p
                         class="text-xs uppercase tracking-wide text-cyan-600 mb-2"
                     >
-                        Category Description
+                        Address
                     </p>
                     <p class="text-sm text-gray-700 leading-relaxed">
-                        {{ selectedCategory.short_description }}
+                        {{ selectedVenue.address }}
                     </p>
                 </div>
             </div>
@@ -519,7 +624,7 @@ const editCategory = (id) => {
     </div>
     <!-- view venue modal end -->
 
-    <!-- delete category modal -->
+    <!-- delete venue modal -->
     <div
         v-if="showDeleteModal"
         class="main-modal fixed w-full h-full inset-0 z-50 flex justify-center items-center"
@@ -559,8 +664,8 @@ const editCategory = (id) => {
                     </svg>
                     <h2 class="text-xl font-bold py-4">Are you sure?</h2>
                     <p class="text-sm text-gray-500 px-8">
-                        Do you really want to delete this event category? This
-                        process cannot be undone.
+                        Do you really want to delete this venue? This process
+                        cannot be undone.
                     </p>
                 </div>
                 <!--footer-->
@@ -572,7 +677,7 @@ const editCategory = (id) => {
                         Cancel
                     </button>
                     <button
-                        @click="deleteCategory()"
+                        @click="deleteVenue()"
                         class="mb-2 md:mb-0 bg-red-500 border border-red-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-red-600"
                     >
                         Delete
@@ -581,5 +686,5 @@ const editCategory = (id) => {
             </div>
         </div>
     </div>
-    <!-- delete category modal end -->
+    <!-- delete venue modal end -->
 </template>

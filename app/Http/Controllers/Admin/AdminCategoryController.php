@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -73,15 +72,40 @@ class AdminCategoryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+        return Inertia::render('Admin/Category/CategoryCreate', [
+            'category' => $category,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $category = Category::findOrFail($id);
+        $validated = $request->validate([
+            'name'          => 'required|string',
+            'status'        => 'nullable',
+            'description'   => 'nullable|string',
+            'categoryPhoto' => 'nullable|file|mimes:jpeg,png|max:2048',
+        ]);
+
+        $filePath = $category->event_logo;
+
+        if ($request->hasFile('categoryPhoto')) {
+            $file = $request->file('categoryPhoto');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('category-photos', $fileName, 'public');
+        }
+
+        $category->update([
+            'name'              => $validated['name'],
+            'short_description' => $validated['description'],
+            'event_logo'        => $filePath,
+            'status'            => $validated['status'], // 1 = active, 0 = inactive
+        ]);
+        return redirect()->route('admin.event-categories.index')->with('message', 'Event category updated successfully.');
     }
 
     /**
@@ -89,6 +113,8 @@ class AdminCategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $getCategory = Category::findOrFail($id);
+        $getCategory->delete();
+        return redirect()->route('admin.event-categories.index')->with('message', 'Event category deleted successfully.');
     }
 }

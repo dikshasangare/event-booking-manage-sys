@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Artist;
+use App\Models\Category;
+use App\Models\Event;
+use App\Models\Venue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class AdminEventController extends Controller
@@ -13,20 +18,17 @@ class AdminEventController extends Controller
      */
     public function index(Request $request)
     {
-        // $query = User::with('roles');
-
-        // if ($request->userSearch) {
-        //     $query->where(function ($q) use ($request) {
-        //         $q->where('name', 'like', '%' . $request->userSearch . '%')
-        //             ->orWhere('email', 'like', '%' . $request->userSearch . '%')
-        //             ->orWhere('contact_number', 'like', '%' . $request->userSearch . '%');
-        //     });
-        // }
-
-        // $users = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+        $query = Event::with(['venue', 'category'])->orderBy('id', 'desc');
+        // ->where('status', 'published')
+        if ($request->eventSearch) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->eventSearch . '%');
+            });
+        }
+        $events = $query->latest()->paginate(10)->withQueryString();
         return Inertia::render('Admin/Event/EventIndex', [
-            // 'users' => $users,
-            // 'filters' => $request->only('userSearch'),
+            'events' => $events,
+            'filters' => $request->only('search'),
         ]);
     }
 
@@ -35,7 +37,11 @@ class AdminEventController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Admin/Event/EventCreate', [
+            'venues'     => Venue::select('id', 'name')->get(),
+            'categories' => Category::select('id', 'name')->get(),
+            'artists'    => Artist::select('id', 'name', 'primary_role')->get(),
+        ]);
     }
 
     /**
@@ -43,8 +49,44 @@ class AdminEventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'venue_id'              => 'nullable|exists:venues,id',
+            'category_id'           => 'required|exists:categories,id',
+            'title'                 => 'required|string',
+            'short_description'     => 'nullable|string',
+            'about_event'           => 'nullable|string',
+            'event_type'            => 'required|string',
+            'age_limit'             => 'nullable|integer',
+            'language'              => 'nullable|string',
+            'start_datetime'        => 'required|date',
+            'end_datetime'          => 'required|date|after:start_datetime',
+            'banner_image'          => 'nullable|image',
+            'artists'               => 'array',
+            'artists.*.id'          => 'exists:artists,id',
+            'artists.*.event_role'  => 'nullable|string',
+        ]);
+
+        if ($request->hasFile('banner_image')) {
+            $file = $request->file('banner_image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $data['banner_image'] = $file->storeAs('event-photos', $fileName, 'public');
+        }
+
+        $data['organizer_id'] = Auth::id();
+        $event = Event::create($data);
+
+        // Attach artists
+        if ($request->artists) {
+            $syncData = [];
+            foreach ($request->artists as $artist) {
+                $syncData[$artist['id']] = ['event_role' => $artist['event_role']];
+            }
+            $event->artists()->sync($syncData);
+        }
+
+        return redirect()->route('admin.events.index')->with('message', 'Event created');
     }
+
 
     /**
      * Display the specified resource.
@@ -59,7 +101,13 @@ class AdminEventController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $event = Event::with(['venue', 'category'])->findOrFail($id);
+        return Inertia::render('Admin/Event/EventCreate', [
+            'event' => $event,
+            'venues'     => Venue::select('id', 'name')->get(),
+            'categories' => Category::select('id', 'name')->get(),
+            'artists'    => Artist::select('id', 'name', 'primary_role')->get(),
+        ]);
     }
 
     /**
@@ -67,7 +115,45 @@ class AdminEventController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        $validated = $request->validate([
+            'venue_id'              => 'nullable|exists:venues,id',
+            'category_id'           => 'required|exists:categories,id',
+            'title'                 => 'required|string',
+            'short_description'     => 'nullable|string',
+            'about_event'           => 'nullable|string',
+            'event_type'            => 'required|string',
+            'age_limit'             => 'nullable|integer',
+            'language'              => 'nullable|string',
+            'start_datetime'        => 'required|date',
+            'end_datetime'          => 'required|date|after:start_datetime',
+            'banner_image'          => 'nullable|image',
+            'artists'               => 'array',
+            'artists.*.id'          => 'exists:artists,id',
+            'artists.*.event_role'  => 'nullable|string',
+        ]);
+
+        $validated['banner_image'] = $event->banner_image;
+        if ($request->hasFile('banner_image')) {
+            $file = $request->file('banner_image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $validated['banner_image'] = $file->storeAs('event-photos', $fileName, 'public');
+        }
+
+        $validated['organizer_id'] = Auth::id();
+        $event->update($validated);
+
+        if ($request->has('artists')) {
+            $syncData = [];
+            foreach ($request->artists as $artist) {
+                $syncData[$artist['id']] = [
+                    'event_role' => $artist['event_role'] ?? null,
+                ];
+            }
+            $event->artists()->sync($syncData);
+        }
+
+        return redirect()->route('admin.events.index')->with('message', 'Event updated successfully.');
     }
 
     /**
@@ -75,6 +161,8 @@ class AdminEventController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        $event->delete();
+        return redirect()->route('admin.events.index')->with('message', 'Event deleted successfully.');
     }
 }

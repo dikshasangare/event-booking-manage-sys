@@ -109,7 +109,24 @@ autoOpenDropdown();
                 </Link>
 
                 <!-- === EVENTS MANAGEMENT === -->
-                <div v-if="hasRole('Admin')">
+                <Link
+                    v-if="hasRole('Admin')"
+                    :href="route('admin.event-categories.index')"
+                    :class="{
+                        'bg-cyan-700 text-white': isLinkActive([
+                            'admin.event-categories.index',
+                            'admin.event-categories.create',
+                            'admin.event-categories.edit',
+                        ]),
+                    }"
+                    class="flex items-center p-3 text-sm text-cyan-800 rounded-lg hover:bg-cyan-700 hover:text-white"
+                >
+                    <Icon name="category" class="w-5 h-5" />
+                    <span v-if="!isMinimized" class="ml-3 flex-1 truncate"
+                        >Event Category</span
+                    >
+                </Link>
+                <!-- <div v-if="hasRole('Admin')">
                     <a
                         @click.prevent="toggleDropdown('categories')"
                         href="#"
@@ -135,7 +152,6 @@ autoOpenDropdown();
                             class="w-4 h-4 ml-auto"
                         />
                     </a>
-
                     <div
                         :class="{
                             'max-h-96 opacity-100':
@@ -158,7 +174,6 @@ autoOpenDropdown();
                             <Icon name="list" class="w-4 h-4 mr-2" /> All
                             Categories
                         </Link>
-
                         <Link
                             :href="route('admin.event-categories.create')"
                             :class="{
@@ -172,10 +187,47 @@ autoOpenDropdown();
                             Category
                         </Link>
                     </div>
-                </div>
+                </div> -->
+
+                <!-- === VENUE MANAGEMENT === -->
+                <Link
+                    v-if="hasRole('Admin')"
+                    :href="route('admin.venues.index')"
+                    :class="{
+                        'bg-cyan-700 text-white': isLinkActive([
+                            'admin.venues.index',
+                            'admin.venues.create',
+                            'admin.venues.edit',
+                            'admin.venues.show',
+                        ]),
+                    }"
+                    class="flex items-center p-3 text-sm text-cyan-800 rounded-lg hover:bg-cyan-700 hover:text-white"
+                >
+                    <Icon name="venue" class="w-5 h-5" />
+                    <span v-if="!isMinimized" class="ml-3 truncate"
+                        >Venues</span
+                    >
+                </Link>
 
                 <!-- === EVENTS MANAGEMENT === -->
-                <div v-if="hasRole('Admin')">
+                <Link
+                    v-if="hasRole('Admin')"
+                    :href="route('admin.events.index')"
+                    :class="{
+                        'bg-cyan-700 text-white': isLinkActive([
+                            'admin.events.index',
+                            'admin.events.create',
+                            'admin.events.edit',
+                        ]),
+                    }"
+                    class="flex items-center p-3 text-sm text-cyan-800 rounded-lg hover:bg-cyan-700 hover:text-white"
+                >
+                    <Icon name="calendar" class="w-5 h-5" />
+                    <span v-if="!isMinimized" class="ml-3 flex-1 truncate"
+                        >Events</span
+                    >
+                </Link>
+                <!-- <div v-if="hasRole('Admin')">
                     <a
                         @click.prevent="toggleDropdown('events')"
                         href="#"
@@ -235,30 +287,10 @@ autoOpenDropdown();
                             Event
                         </Link>
                     </div>
-                </div>
-
-                <!-- === VENUE MANAGEMENT === -->
-                <Link
-                    v-if="hasRole('Admin')"
-                    :href="route('admin.venues.index')"
-                    :class="{
-                        'bg-cyan-700 text-white': isLinkActive([
-                            'admin.venues.index',
-                            'admin.venues.create',
-                            'admin.venues.edit',
-                            'admin.venues.show',
-                        ]),
-                    }"
-                    class="flex items-center p-3 text-sm text-cyan-800 rounded-lg hover:bg-cyan-700 hover:text-white"
-                >
-                    <Icon name="location" class="w-5 h-5" />
-                    <span v-if="!isMinimized" class="ml-3 truncate"
-                        >Venues</span
-                    >
-                </Link>
+                </div> -->
 
                 <!-- === TICKET TYPES === -->
-                <Link
+                <!-- <Link
                     v-if="hasRole('Admin')"
                     :href="route('admin.ticket-types.index')"
                     :class="{
@@ -271,11 +303,11 @@ autoOpenDropdown();
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"
                 >
-                    <Icon name="ticket" class="w-5 h-5" />
+                    <Icon name="ticketType" class="w-5 h-5" />
                     <span v-if="!isMinimized" class="ml-3 truncate"
                         >Ticket Types</span
                     >
-                </Link>
+                </Link> -->
 
                 <!-- === BOOKINGS === -->
                 <Link
@@ -426,7 +458,7 @@ autoOpenDropdown();
                             'manager.events.index',
                             'manager.events.create',
                             'manager.events.edit',
-                            'manager.events.show',
+                            'manager.events.show'
                         ),
                     }"
                     class="flex items-center p-3 text-sm rounded-lg text-cyan-800 hover:bg-cyan-700 hover:text-white"

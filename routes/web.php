@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminArtistController;
 use App\Http\Controllers\Admin\AdminBookingController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminEventController;
@@ -65,8 +66,28 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Admin'])->grou
 
     Route::resource('event-categories', AdminCategoryController::class);
     Route::resource('events', AdminEventController::class);
+    // Route::get('/events/{event:slug}', [EventPublicController::class, 'show'])->name('events.show');
+    Route::get('artists/search', [AdminArtistController::class, 'search'])->name('artists.search');
+
+
+     // ✅ EVENT → TICKET TYPES (INDEX + CREATE + STORE)
+    Route::prefix('events/{event}')->group(function () {
+        Route::get('ticket-types', [AdminTicketTypeController::class, 'eventIndex'])->name('events.ticket-types.index');
+
+        Route::get('ticket-types/create', [AdminTicketTypeController::class, 'create'])->name('events.ticket-types.create');
+
+        Route::post('ticket-types', [AdminTicketTypeController::class, 'store'])->name('events.ticket-types.store');
+    });
+
+    // ✅ GLOBAL (EDIT / UPDATE / DELETE ONLY)
+    Route::resource('ticket-types', AdminTicketTypeController::class)->except(['index', 'create', 'store']);
+
+
+
+
+
     Route::resource('venues', AdminVenueController::class);
-    Route::resource('ticket-types', AdminTicketTypeController::class);
+    // Route::resource('ticket-types', AdminTicketTypeController::class);
     Route::resource('bookings', AdminBookingController::class);
     Route::resource('payments', AdminPaymentController::class);
     Route::resource('refunds', AdminRefundController::class);

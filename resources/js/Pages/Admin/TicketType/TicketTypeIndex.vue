@@ -5,21 +5,23 @@ import { ref, watch } from "vue";
 import Icon from "@/Components/Icon.vue";
 
 const props = defineProps({
-    venues: Object,
+    event: Object,
+    ticketTypes: Object,
+    filters: Object,
 });
 
-const venueCreate = () => {
-    router.visit("/admin/venues/create");
+const ticketTypeCreate = (eventId) => {
+    router.visit(`/admin/events/${eventId}/ticket-types/create`);
 };
 
-const venueSearch = ref(props.filters?.venueSearch || "");
+const ticketTypeSearch = ref(props.filters?.ticketTypeSearch || "");
 let timeout = null;
-watch(venueSearch, (value) => {
+watch(ticketTypeSearch, (value) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
         router.get(
-            "/admin/venues",
-            { venueSearch: value },
+            "/admin/ticket-types",
+            { ticketTypeSearch: value },
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -29,46 +31,50 @@ watch(venueSearch, (value) => {
     }, 400);
 });
 
-const venueIdBeingDeleted = ref(null);
+const ticketTypeIdBeingDeleted = ref(null);
 const showDeleteModal = ref(false);
+
 const showViewDetailModal = ref(false);
-const selectedVenue = ref(null);
+const selectedCategory = ref(null);
 
-const confirmVenueDeletion = (id) => {
-    venueIdBeingDeleted.value = id;
+const confirmCategoryDelete = (id) => {
+    ticketTypeIdBeingDeleted.value = id;
     showDeleteModal.value = true;
-};
-
-const confirmVenueShow = (venue) => {
-    selectedVenue.value = venue;
-    showViewDetailModal.value = true;
 };
 
 const closeDeleteModal = () => {
     showDeleteModal.value = false;
-    venueIdBeingDeleted.value = null;
+    ticketTypeIdBeingDeleted.value = null;
+};
+
+const confirmCategoryShow = (ticketType) => {
+    selectedCategory.value = ticketType;
+    showViewDetailModal.value = true;
 };
 
 const closeViewDetailModal = () => {
     showViewDetailModal.value = false;
-    selectedVenue.value = null;
+    selectedCategory.value = null;
 };
 
-const deleteVenue = () => {
-    router.delete(route("admin.venues.destroy", venueIdBeingDeleted.value), {
-        onSuccess: () => {
-            closeDeleteModal();
-        },
-    });
+const deleteCategory = () => {
+    router.delete(
+        route("admin.ticket-types.destroy", ticketTypeIdBeingDeleted.value),
+        {
+            onSuccess: () => {
+                closeDeleteModal();
+            },
+        }
+    );
 };
 
-const editVenue = (id) => {
-    router.visit(route("admin.venues.edit", id));
+const editCategory = (id) => {
+    router.visit(route("admin.ticket-types.edit", id));
 };
 </script>
 
 <template>
-    <Head title="Venues" />
+    <Head title="Categories" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -77,18 +83,21 @@ const editVenue = (id) => {
                     <h2
                         class="text-xl inline-flex font-semibold leading-tight text-gray-800"
                     >
-                        <Icon name="venue" class="my-auto h-6 w-6 mx-3" />
-                        Event Venues
+                        <Icon
+                            name="ticketType"
+                            class="my-auto h-6 w-6 mx-3 line-clamp-2"
+                        />
+                        Ticket Types – {{ event.title }}
                     </h2>
                 </div>
                 <div>
                     <button
                         type="button"
-                        @click="venueCreate()"
-                        class="bg-cyan-700 hover:bg-cyan-500 text-cyan-50 text-xs font-normal py-2 px-4 rounded-full"
+                        @click="ticketTypeCreate(event.id)"
+                        class="bg-cyan-700 hover:bg-cyan-500 text-cyan-50 font-normal text-xs py-2 px-4 rounded-full"
                     >
                         <Icon name="create" class="h-4 w-4 inline-block" />
-                        Add Venue
+                        Add Ticket Type
                     </button>
                 </div>
             </div>
@@ -133,7 +142,7 @@ const editVenue = (id) => {
                             type="text"
                             placeholder="Search"
                             class="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                            v-model="venueSearch"
+                            v-model="ticketTypeSearch"
                         />
                     </div>
                 </div>
@@ -155,47 +164,35 @@ const editVenue = (id) => {
                                                 scope="col"
                                                 class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500"
                                             >
-                                                <button
-                                                    class="flex items-center gap-x-3 focus:outline-none"
-                                                >
-                                                    <span>Venue Name</span>
-                                                </button>
+                                                <span>Name</span>
                                             </th>
+
                                             <th
                                                 scope="col"
                                                 class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
                                             >
-                                                City
+                                                Price
                                             </th>
+
                                             <th
                                                 scope="col"
                                                 class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
                                             >
-                                                State
+                                                Availability
                                             </th>
-                                            <th
-                                                scope="col"
-                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
-                                            >
-                                                Country
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
-                                            >
-                                                Capacity
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
-                                            >
-                                                Address
-                                            </th>
+
                                             <th
                                                 scope="col"
                                                 class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
                                             >
                                                 Status
+                                            </th>
+
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500"
+                                            >
+                                                Visibility
                                             </th>
                                             <th
                                                 scope="col"
@@ -207,113 +204,139 @@ const editVenue = (id) => {
                                         class="bg-white divide-y divide-gray-200"
                                     >
                                         <tr
-                                            v-for="venue in venues.data"
-                                            :key="venue.id"
+                                            v-for="ticketType in ticketTypes.data"
+                                            :key="ticketType.id"
                                         >
                                             <td
                                                 class="px-4 py-4 text-sm font-medium whitespace-nowrap"
                                             >
-                                                <div
-                                                    class="flex items-center space-x-3"
+                                                <h2
+                                                    class="font-semibold uppercase text-gray-800"
                                                 >
-                                                    <img
-                                                        :src="
-                                                            venue.venue_image
-                                                                ? `/storage/${venue.venue_image}`
-                                                                : '/images/default-avatar.png'
-                                                        "
-                                                        alt="User Photo"
-                                                        class="w-12 h-12 rounded-full border border-cyan-800 object-cover"
-                                                    />
-                                                    <div>
-                                                        <h2
-                                                            class="font-semibold text-gray-800"
-                                                        >
-                                                            {{ venue.name }}
-                                                        </h2>
-                                                        <p
-                                                            class="font-medium text-xs text-gray-500"
-                                                        >
-                                                            {{ venue.slug }}
-                                                        </p>
+                                                    {{ ticketType.name }}
+                                                </h2>
+                                            </td>
+
+                                            <td
+                                                class="px-4 py-4 text-sm whitespace-nowrap"
+                                            >
+                                                <span
+                                                    v-if="ticketType.is_free"
+                                                    class="text-emerald-700 font-bold"
+                                                >
+                                                    Free
+                                                </span>
+                                                <span
+                                                    v-else
+                                                    class="text-gray-800 font-medium"
+                                                >
+                                                    {{ ticketType.price }}
+                                                    {{ ticketType.currency }}
+                                                </span>
+                                            </td>
+
+                                            <td
+                                                class="px-4 py-4 text-sm font-medium whitespace-nowrap"
+                                            >
+                                                <div
+                                                    class="flex flex-col gap-1"
+                                                >
+                                                    <span
+                                                        class="text-xs font-semibold"
+                                                    >
+                                                        {{ ticketType.sold }} /
+                                                        {{
+                                                            ticketType.quantity
+                                                        }}
+                                                        sold
+                                                    </span>
+
+                                                    <div
+                                                        class="w-32 h-1.5 bg-gray-200 rounded-full overflow-hidden"
+                                                    >
+                                                        <div
+                                                            class="h-full bg-cyan-600 transition-all"
+                                                            :style="{
+                                                                width: ticketType.quantity
+                                                                    ? (ticketType.sold /
+                                                                          ticketType.quantity) *
+                                                                          100 +
+                                                                      '%'
+                                                                    : '0%',
+                                                            }"
+                                                        ></div>
                                                     </div>
+
+                                                    <span
+                                                        class="text-[11px] text-gray-500"
+                                                    >
+                                                        Max
+                                                        {{
+                                                            ticketType.max_per_order
+                                                        }}
+                                                        per order
+                                                    </span>
                                                 </div>
                                             </td>
+
                                             <td
-                                                class="px-4 py-4 text-xs whitespace-nowrap"
-                                            >
-                                                <p class="text-gray-500">
-                                                    {{ venue.city }}
-                                                </p>
-                                            </td>
-                                            <td
-                                                class="px-4 py-4 text-xs whitespace-nowrap"
-                                            >
-                                                <p class="text-gray-500">
-                                                    {{ venue.state }}
-                                                </p>
-                                            </td>
-                                            <td
-                                                class="px-4 py-4 text-xs whitespace-nowrap"
-                                            >
-                                                <p class="text-gray-500">
-                                                    {{ venue.country }}
-                                                </p>
-                                            </td>
-                                            <td
-                                                class="px-4 py-4 text-xs whitespace-nowrap"
-                                            >
-                                                <p class="text-gray-500">
-                                                    {{ venue.capacity }}
-                                                </p>
-                                            </td>
-                                            <td
-                                                class="px-4 py-4 text-xs whitespace-nowrap"
-                                            >
-                                                <p class="text-gray-500">
-                                                    {{
-                                                        venue.address
-                                                            ?.split(" ")
-                                                            .slice(0, 2)
-                                                            .join(" ")
-                                                    }}...
-                                                </p>
-                                            </td>
-                                            <td
-                                                class="px-4 py-4 text-xs whitespace-nowrap"
+                                                class="px-4 py-4 text-sm whitespace-nowrap"
                                             >
                                                 <div>
                                                     <span
                                                         class="capitalize px-1.5 py-1 rounded text-xs mr-1"
                                                         :class="{
                                                             'bg-green-700 text-white':
-                                                                venue.is_active ===
-                                                                '1',
+                                                                ticketType.status ===
+                                                                'active',
                                                             ' bg-red-700 text-white':
-                                                                venue.is_active !==
-                                                                '1',
+                                                                ticketType.status !==
+                                                                'active',
                                                         }"
                                                     >
                                                         {{
-                                                            venue.is_active ===
-                                                            "1"
+                                                            ticketType.status ===
+                                                            "active"
                                                                 ? "Active"
                                                                 : "Inactive"
                                                         }}
                                                     </span>
                                                 </div>
                                             </td>
+
                                             <td
-                                                class="text-xs whitespace-nowrap"
+                                                class="px-4 py-4 text-sm font-medium whitespace-nowrap"
+                                            >
+                                                <span
+                                                    class="px-2 py-1 rounded-full text-xs font-semibold"
+                                                    :class="{
+                                                        'bg-cyan-600 text-white':
+                                                            ticketType.is_visible,
+                                                        'bg-gray-400 text-white':
+                                                            !ticketType.is_visible,
+                                                    }"
+                                                >
+                                                    {{
+                                                        ticketType.is_visible
+                                                            ? "Visible"
+                                                            : "Hidden"
+                                                    }}
+                                                </span>
+                                            </td>
+
+                                            <td
+                                                class="text-sm whitespace-nowrap"
                                             >
                                                 <div
                                                     class="flex items-center gap-1"
                                                 >
                                                     <button
-                                                        type="button"
                                                         @click="
-                                                            editVenue(venue.id)
+                                                            editCategory(
+                                                                ticketType.id
+                                                            )
                                                         "
+                                                        type="button"
                                                         class="inline-flex items-center gap-1 bg-blue-700 hover:bg-blue-500 text-blue-50 font-normal text-xs py-1 px-2 rounded-full"
                                                     >
                                                         <Icon
@@ -323,12 +346,12 @@ const editVenue = (id) => {
                                                         <span>Edit</span>
                                                     </button>
                                                     <button
-                                                        type="button"
                                                         @click="
-                                                            confirmVenueShow(
-                                                                venue
+                                                            confirmCategoryShow(
+                                                                ticketType
                                                             )
                                                         "
+                                                        type="button"
                                                         class="inline-flex items-center gap-1 bg-blue-700 hover:bg-blue-500 text-blue-50 font-normal text-xs py-1 px-2 rounded-full"
                                                     >
                                                         <Icon
@@ -338,12 +361,12 @@ const editVenue = (id) => {
                                                         <span>View</span>
                                                     </button>
                                                     <button
-                                                        type="button"
                                                         @click="
-                                                            confirmVenueDeletion(
-                                                                venue.id
+                                                            confirmCategoryDelete(
+                                                                ticketType.id
                                                             )
                                                         "
+                                                        type="button"
                                                         class="inline-flex items-center gap-1 bg-red-700 hover:bg-red-500 text-red-50 font-normal text-xs py-1 px-2 rounded-full"
                                                     >
                                                         <Icon
@@ -356,9 +379,11 @@ const editVenue = (id) => {
                                             </td>
                                         </tr>
                                         <!-- When no data exists -->
-                                        <tr v-if="venues.data.length === 0">
+                                        <tr
+                                            v-if="ticketTypes.data.length === 0"
+                                        >
                                             <td
-                                                colspan="8"
+                                                colspan="6"
                                                 class="text-center py-4 text-gray-500"
                                             >
                                                 No record found
@@ -376,8 +401,8 @@ const editVenue = (id) => {
                     <div class="text-sm text-gray-500">
                         Page
                         <span class="font-medium text-gray-700">
-                            {{ venues.current_page }} of
-                            {{ venues.last_page }}
+                            {{ ticketTypes.current_page }} of
+                            {{ ticketTypes.last_page }}
                         </span>
                     </div>
 
@@ -388,12 +413,12 @@ const editVenue = (id) => {
                             class="flex items-center justify-center px-3 py-2 text-sm bg-white border rounded-md gap-x-2 hover:bg-gray-100"
                             :class="{
                                 'text-gray-400 cursor-not-allowed':
-                                    !venues.prev_page_url,
+                                    !ticketTypes.prev_page_url,
                             }"
-                            :disabled="!venues.prev_page_url"
+                            :disabled="!ticketTypes.prev_page_url"
                             @click="
-                                venues.prev_page_url &&
-                                    router.visit(venues.prev_page_url)
+                                ticketTypes.prev_page_url &&
+                                    router.visit(ticketTypes.prev_page_url)
                             "
                         >
                             <svg
@@ -415,7 +440,7 @@ const editVenue = (id) => {
 
                         <!-- Number Buttons -->
                         <template
-                            v-for="link in venues.links"
+                            v-for="link in ticketTypes.links"
                             :key="link.label"
                         >
                             <button
@@ -440,12 +465,12 @@ const editVenue = (id) => {
                             class="flex items-center justify-center px-3 py-2 text-sm bg-white border rounded-md gap-x-2 hover:bg-gray-100"
                             :class="{
                                 'text-gray-400 cursor-not-allowed':
-                                    !venues.next_page_url,
+                                    !ticketTypes.next_page_url,
                             }"
-                            :disabled="!venues.next_page_url"
+                            :disabled="!ticketTypes.next_page_url"
                             @click="
-                                venues.next_page_url &&
-                                    router.visit(venues.next_page_url)
+                                ticketTypes.next_page_url &&
+                                    router.visit(ticketTypes.next_page_url)
                             "
                         >
                             <span>Next</span>
@@ -470,7 +495,7 @@ const editVenue = (id) => {
         </div>
     </AuthenticatedLayout>
 
-    <!-- view venue modal -->
+    <!-- view ticketType modal -->
     <div
         v-if="showViewDetailModal"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
@@ -478,14 +503,14 @@ const editVenue = (id) => {
         <div
             class="relative bg-white w-11/12 md:max-w-2xl rounded-3xl shadow-2xl overflow-hidden"
         >
-            <div class="relative h-48 md:h-56">
+            <div class="relative h-48 md:h-64">
                 <img
                     :src="
-                        selectedVenue.venue_image
-                            ? `/storage/${selectedVenue.venue_image}`
+                        selectedCategory.event_logo
+                            ? `/storage/${selectedCategory.event_logo}`
                             : '/images/default-avatar.png'
                     "
-                    class="absolute inset-0 w-full h-full object-cover"
+                    class="absolute inset-0 w-full h-full"
                 />
                 <div
                     class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
@@ -516,86 +541,28 @@ const editVenue = (id) => {
 
                 <div class="absolute bottom-4 left-6 text-white">
                     <h2 class="text-2xl font-bold tracking-wide">
-                        {{ selectedVenue.name }}
+                        {{ selectedCategory.name }}
                     </h2>
-                    <p class="text-sm text-white/80">
-                        {{ selectedVenue.slug }}
-                    </p>
                 </div>
             </div>
 
-            <div class="px-6 py-3 space-y-3">
+            <div class="px-6 py-3 space-y-5">
                 <div class="flex flex-wrap items-center justify-between">
                     <span
                         class="inline-block px-3 py-1 rounded-full text-xs font-medium"
                         :class="{
                             'bg-green-600 text-white':
-                                selectedVenue.is_active === '1',
+                                selectedCategory.status === '1',
                             'bg-red-600 text-white':
-                                selectedVenue.is_active !== '1',
+                                selectedCategory.status !== '1',
                         }"
                     >
                         {{
-                            selectedVenue.is_active === "1"
-                                ? "Active Venue"
-                                : "Inactive Venue"
+                            selectedCategory.status === "1"
+                                ? "Active Category"
+                                : "Inactive Category"
                         }}
                     </span>
-
-                    <div class="flex gap-3">
-                        <div
-                            class="px-4 py-2 rounded-xl text-center bg-gradient-to-br from-cyan-50 to-white border"
-                        >
-                            <p class="text-xs text-cyan-600">Capacity</p>
-                            <p
-                                class="font-normal text-sm text-gray-800 leading-relaxed"
-                            >
-                                {{ selectedVenue.capacity }}
-                            </p>
-                        </div>
-                        <div
-                            class="bg-gradient-to-br from-cyan-50 to-white border px-4 py-2 rounded-xl text-center"
-                        >
-                            <p class="text-xs text-cyan-600">Country</p>
-                            <p
-                                class="font-normal text-sm text-gray-800 leading-relaxed"
-                            >
-                                {{ selectedVenue.country }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div
-                        class="py-3 rounded-2xl text-center bg-gradient-to-br from-gray-50 to-white border"
-                    >
-                        <p
-                            class="text-xs uppercase tracking-wide text-gray-400"
-                        >
-                            City
-                        </p>
-                        <p
-                            class="text-md font-normal text-gray-800 leading-relaxed"
-                        >
-                            {{ selectedVenue.city }}
-                        </p>
-                    </div>
-
-                    <div
-                        class="py-3 rounded-2xl text-center bg-gradient-to-br from-gray-50 to-white border"
-                    >
-                        <p
-                            class="text-xs uppercase tracking-wide text-gray-400"
-                        >
-                            State
-                        </p>
-                        <p
-                            class="text-md font-normal text-gray-800 leading-relaxed"
-                        >
-                            {{ selectedVenue.state }}
-                        </p>
-                    </div>
                 </div>
 
                 <div
@@ -604,10 +571,10 @@ const editVenue = (id) => {
                     <p
                         class="text-xs uppercase tracking-wide text-cyan-600 mb-2"
                     >
-                        Address
+                        Category Description
                     </p>
                     <p class="text-sm text-gray-700 leading-relaxed">
-                        {{ selectedVenue.address }}
+                        {{ selectedCategory.short_description }}
                     </p>
                 </div>
             </div>
@@ -625,7 +592,7 @@ const editVenue = (id) => {
     </div>
     <!-- view venue modal end -->
 
-    <!-- delete venue modal -->
+    <!-- delete ticketType modal -->
     <div
         v-if="showDeleteModal"
         class="main-modal fixed w-full h-full inset-0 z-50 flex justify-center items-center"
@@ -665,8 +632,8 @@ const editVenue = (id) => {
                     </svg>
                     <h2 class="text-xl font-bold py-4">Are you sure?</h2>
                     <p class="text-sm text-gray-500 px-8">
-                        Do you really want to delete this venue? This process
-                        cannot be undone.
+                        Do you really want to delete this event ticketType? This
+                        process cannot be undone.
                     </p>
                 </div>
                 <!--footer-->
@@ -678,7 +645,7 @@ const editVenue = (id) => {
                         Cancel
                     </button>
                     <button
-                        @click="deleteVenue()"
+                        @click="deleteCategory()"
                         class="mb-2 md:mb-0 bg-red-500 border border-red-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-red-600"
                     >
                         Delete
@@ -687,5 +654,5 @@ const editVenue = (id) => {
             </div>
         </div>
     </div>
-    <!-- delete venue modal end -->
+    <!-- delete ticketType modal end -->
 </template>

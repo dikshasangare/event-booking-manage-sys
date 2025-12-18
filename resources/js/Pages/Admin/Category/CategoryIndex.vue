@@ -12,14 +12,14 @@ const categoryCreate = () => {
     router.visit("/admin/event-categories/create");
 };
 
-const userSearch = ref(props.filters?.userSearch || "");
+const categorySearch = ref(props.filters?.categorySearch || "");
 let timeout = null;
-watch(userSearch, (value) => {
+watch(categorySearch, (value) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
         router.get(
-            "/admin/users",
-            { userSearch: value },
+            "/admin/event-categories",
+            { categorySearch: value },
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -79,8 +79,9 @@ const editCategory = (id) => {
             <div class="flex justify-between">
                 <div class="my-auto">
                     <h2
-                        class="text-xl font-semibold leading-tight text-gray-800"
+                        class="text-xl inline-flex font-semibold leading-tight text-gray-800"
                     >
+                        <Icon name="category" class="my-auto h-6 w-6 mx-3" />
                         Event Categories
                     </h2>
                 </div>
@@ -136,7 +137,7 @@ const editCategory = (id) => {
                             type="text"
                             placeholder="Search"
                             class="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                            v-model="userSearch"
+                            v-model="categorySearch"
                         />
                     </div>
                 </div>

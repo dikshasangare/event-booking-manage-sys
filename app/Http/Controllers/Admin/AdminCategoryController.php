@@ -12,15 +12,15 @@ class AdminCategoryController extends Controller
     public function index(Request $request)
     {
         $query = Category::orderBy('id', 'desc');
-        if ($request->userSearch) {
+        if ($request->categorySearch) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->userSearch . '%');
+                $q->where('name', 'like', '%' . $request->categorySearch . '%');
             });
         }
         $categories = $query->paginate(10)->withQueryString();
         return Inertia::render('Admin/Category/CategoryIndex', [
             'categories' => $categories,
-            'filters' => $request->only('userSearch'),
+            'filters' => $request->only('categorySearch'),
         ]);
     }
     /**

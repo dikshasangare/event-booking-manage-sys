@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import CustomerLayout from "@/Layouts/CustomerLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 
 import { ref, onMounted, onBeforeUnmount } from "vue";
@@ -100,13 +100,13 @@ onBeforeUnmount(() => {
     heroSubtitleSplit?.revert();
 });
 
-const categories = ref([
-    { name: "Concert", icon: MusicalNoteIcon },
-    { name: "Sports", icon: TrophyIcon },
-    { name: "Workshop", icon: WrenchScrewdriverIcon },
-    { name: "Conference", icon: MicrophoneIcon },
-    { name: "Festival", icon: SparklesIcon },
-]);
+// const categories = ref([
+//     { name: "Concert", icon: MusicalNoteIcon },
+//     { name: "Sports", icon: TrophyIcon },
+//     { name: "Workshop", icon: WrenchScrewdriverIcon },
+//     { name: "Conference", icon: MicrophoneIcon },
+//     { name: "Festival", icon: SparklesIcon },
+// ]);
 
 const events = ref([
     {
@@ -149,6 +149,14 @@ const steps = ref([
         icon: "ConfirmIcon",
     },
 ]);
+
+const props = defineProps({
+    categories: Object,
+});
+
+const browseCategory = (name) => {
+    router.visit(route("category.show", name));
+};
 </script>
 
 <template>
@@ -240,8 +248,8 @@ const steps = ref([
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 py-10"
             >
                 <div
-                    v-for="c in categories"
-                    :key="c.name"
+                    v-for="category in categories"
+                    :key="category.id"
                     class="group relative cursor-pointer overflow-hidden bg-white px-6 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl rounded-xl"
                 >
                     <!-- expanding circle -->
@@ -254,9 +262,14 @@ const steps = ref([
                         <span
                             class="grid h-20 w-20 place-items-center rounded-full bg-cyan-500 transition-all duration-300 group-hover:bg-cyan-800"
                         >
-                            <component
-                                :is="c.icon"
-                                class="h-10 w-10 text-white transition-all"
+                            <img
+                                :src="
+                                    category.event_logo
+                                        ? `/storage/${category.event_logo}`
+                                        : '/images/default-avatar.png'
+                                "
+                                alt="Category Logo"
+                                class="w-12 h-12 object-cover rounded-full"
                             />
                         </span>
 
@@ -264,18 +277,18 @@ const steps = ref([
                         <div
                             class="space-y-6 pt-5 text-base leading-7 text-gray-600 transition-all duration-300 group-hover:text-white/90"
                         >
-                            <p>{{ c.name }}</p>
+                            <p>{{ category.name }}</p>
                         </div>
 
                         <!-- link -->
                         <div class="pt-5 text-base font-semibold leading-7">
                             <p>
-                                <a
-                                    href="#"
+                                <button
+                                    @click="browseCategory(category.name)"
                                     class="text-cyan-800 transition-all duration-300 group-hover:text-white"
                                 >
-                                    Browse events →
-                                </a>
+                                    Browse Categories →
+                                </button>
                             </p>
                         </div>
                     </div>
@@ -284,14 +297,14 @@ const steps = ref([
         </section>
 
         <!-- ========================= -->
-        <!-- Featucyan Events -->
+        <!-- Feature Events -->
         <!-- ========================= -->
         <section class="pb-16 px-6 max-w-7xl mx-auto">
             <h2
                 class="text-3xl font-bold mb-6 text-cyan-700"
                 :ref="registerSectionTitle"
             >
-                Featucyan Events
+                Feature Events
             </h2>
             <hr />
 

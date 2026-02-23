@@ -16,4 +16,9 @@ class Category extends Model
         'event_logo',
         'status',
     ];
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }

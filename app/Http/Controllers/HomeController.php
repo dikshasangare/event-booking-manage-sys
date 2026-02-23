@@ -16,7 +16,7 @@ class HomeController extends Controller
             'canRegister' => Route::has('register'),
             'laravelVersion' => Application::VERSION,
             'phpVersion' => PHP_VERSION,
-            'categories' => Category::where('status', 1)->get(),
+            'categories' => Category::where('status', 1)->latest()->take(5)->get(),
         ]);
     }
 }

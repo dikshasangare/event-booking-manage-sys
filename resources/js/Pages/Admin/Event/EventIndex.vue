@@ -154,7 +154,7 @@ const addTicketType = (id) => {
                                     <div
                                         v-for="event in events.data"
                                         :key="event.id"
-                                        class="relative group border border-cyan-200 rounded-[32px] overflow-hidden"
+                                        class="relative rounded-[32px] overflow-hidden bg-gradient-to-r from-cyan-500/15 via-cyan-400/5 to-cyan-500/15 flex flex-col h-full"
                                     >
                                         <!-- Background Glow -->
                                         <!-- bg-gradient-to-br from-cyan-500/40 via-cyan-500/20 to-fuchsia-500/40 blur-xl -->
@@ -257,7 +257,7 @@ const addTicketType = (id) => {
 
                                             <!-- Floating Info Panel -->
                                             <div
-                                                class="-mt-14 mx-6 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 space-y-4"
+                                                class="-mt-14 mx-6 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 space-y-4 flex-1"
                                             >
                                                 <p
                                                     class="text-sm text-gray-700 leading-relaxed line-clamp-1"
@@ -328,7 +328,7 @@ const addTicketType = (id) => {
 
                                             <!-- Footer Actions -->
                                             <div
-                                                class="relative px-3 py-6 mt-6"
+                                                class="relative px-3 py-6 mt-6 min-h-[96px]"
                                             >
                                                 <!-- Cyan Glow Background -->
                                                 <div
@@ -339,48 +339,72 @@ const addTicketType = (id) => {
                                                     class="relative flex items-center justify-between gap-x-1"
                                                 >
                                                     <!-- Primary CTA -->
-                                                    <button
-                                                        v-if="
-                                                            ![
-                                                                'cancelled',
-                                                                'published',
-                                                            ].includes(
-                                                                event.status
-                                                            )
-                                                        "
-                                                        @click="
-                                                            addTicketType(
-                                                                event.id
-                                                            )
-                                                        "
-                                                        class="group inline-flex items-center gap-0 px-3 py-2.5 rounded-full bg-gradient-to-r from-cyan-600 to-cyan-500 text-white text-xs font-bold tracking-wide shadow-lg shadow-cyan-500/30 hover:from-cyan-500 hover:to-cyan-400 hover:scale-[1.03] transition-all duration-300"
-                                                    >
-                                                        Ticket Type
-                                                        <Icon
-                                                            name="create"
-                                                            class="h-4 w-4 mx-1 my-auto"
-                                                        />
-                                                    </button>
+                                                    <div class="space-y-2">
+                                                        <button
+                                                            v-if="
+                                                                ![
+                                                                    'cancelled',
+                                                                    'published',
+                                                                ].includes(
+                                                                    event.status
+                                                                )
+                                                            "
+                                                            @click="
+                                                                addTicketType(
+                                                                    event.id
+                                                                )
+                                                            "
+                                                            class="group inline-flex items-center gap-0 px-3 py-2.5 rounded-full bg-gradient-to-r from-cyan-600 to-cyan-500 text-white text-xs font-bold tracking-wide shadow-lg shadow-cyan-500/30 hover:from-cyan-500 hover:to-cyan-400 hover:scale-[1.03] transition-all duration-300"
+                                                        >
+                                                            Ticket Type
+                                                            <Icon
+                                                                name="create"
+                                                                class="h-4 w-4 mx-1 my-auto"
+                                                            />
+                                                        </button>
+                                                        <button
+                                                            v-if="
+                                                                ![
+                                                                    'cancelled',
+                                                                    'published',
+                                                                ].includes(
+                                                                    event.status
+                                                                )
+                                                            "
+                                                            @click="
+                                                                addTicketType(
+                                                                    event.id
+                                                                )
+                                                            "
+                                                            class="group inline-flex items-center gap-0 px-3 py-2.5 rounded-full bg-gradient-to-r from-cyan-600 to-cyan-500 text-white text-xs font-bold tracking-wide shadow-lg shadow-cyan-500/30 hover:from-cyan-500 hover:to-cyan-400 hover:scale-[1.03] transition-all duration-300"
+                                                        >
+                                                            Add Venue
+                                                            <Icon
+                                                                name="create"
+                                                                class="h-4 w-4 mx-1 my-auto"
+                                                            />
+                                                        </button>
 
-                                                    <span
-                                                        v-else-if="
-                                                            event.status ===
-                                                            'cancelled'
-                                                        "
-                                                        class="text-sm font-bold text-red-700 cursor-not-allowed"
-                                                    >
-                                                        Event Cancelled
-                                                    </span>
+                                                        <span
+                                                            v-else-if="
+                                                                event.status ===
+                                                                'cancelled'
+                                                            "
+                                                            class="text-sm font-bold text-red-700 cursor-not-allowed h-full"
+                                                        >
+                                                            Event Cancelled
+                                                        </span>
 
-                                                    <span
-                                                        v-else-if="
-                                                            event.status ===
-                                                            'published'
-                                                        "
-                                                        class="text-sm font-bold text-green-700 cursor-not-allowed"
-                                                    >
-                                                        Event Published
-                                                    </span>
+                                                        <span
+                                                            v-else-if="
+                                                                event.status ===
+                                                                'published'
+                                                            "
+                                                            class="text-sm font-bold text-green-700 cursor-not-allowed h-full"
+                                                        >
+                                                            Event Published
+                                                        </span>
+                                                    </div>
 
                                                     <!-- Action Icons -->
                                                     <div

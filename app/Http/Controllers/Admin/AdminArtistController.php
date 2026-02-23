@@ -29,7 +29,27 @@ class AdminArtistController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string',
+            'primary_role' => 'nullable|string',
+            'bio' => 'nullable|string',
+            'photo' => 'nullable|file|mimes:jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $fileName = time().'_'.$file->getClientOriginalName();
+            $filePath = $file->storeAs('artist-photos', $fileName, 'public');
+        }
+
+        Artist::create([
+            'name' => $request->name,
+            'primary_role' => $request->primary_role,
+            'bio' => $request->bio,
+            'photo' => $request->hasFile('photo') ? $filePath : null,
+        ]);
+
+        return redirect()->route('admin.events.create')->with('message', 'Artist created successfully.');
     }
 
     /**
@@ -67,7 +87,7 @@ class AdminArtistController extends Controller
     public function search(Request $request)
     {
         $request->validate([
-            'q' => 'nullable|string|min:2'
+            'q' => 'nullable|string|min:2',
         ]);
 
         return Artist::where('name', 'like', "%{$request->q}%")->select('id', 'name', 'primary_role')->limit(10)->get();

@@ -4,7 +4,7 @@ import CustomerLayout from "@/Layouts/CustomerLayout.vue";
 import { Head } from "@inertiajs/vue3";
 import Icon from "@/Components/Icon.vue";
 
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import {
     MusicalNoteIcon,
     TrophyIcon,
@@ -12,6 +12,93 @@ import {
     MicrophoneIcon,
     SparklesIcon,
 } from "@heroicons/vue/24/outline";
+
+import gsap from "gsap";
+import SplitType from "split-type";
+
+import ScrollTrigger from "gsap/dist/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
+
+const heroTitleRef = ref(null);
+const heroSubtitleRef = ref(null);
+const sectionTitles = [];
+const registerSectionTitle = (el) => {
+    if (el && !sectionTitles.includes(el)) {
+        sectionTitles.push(el);
+    }
+};
+
+let heroTitleSplit;
+let heroSubtitleSplit;
+// animation initialization function
+const initAnimations = () => {
+    /* HERO TITLE */
+    heroTitleSplit = new SplitType(heroTitleRef.value, {
+        types: "chars",
+    });
+
+    gsap.from(heroTitleSplit.chars, {
+        // y: 120,
+        opacity: 0,
+        // duration: 1,
+        yPercent: 100,
+        duration: 2,
+        // ease: "power4.out",
+        ease: "power4.out",
+        // stagger: 0.05,
+        stagger: { amount: 2 },
+    });
+
+    /* HERO SUBTITLE */
+    heroSubtitleSplit = new SplitType(heroSubtitleRef.value, {
+        types: "words",
+    });
+
+    gsap.from(heroSubtitleSplit.words, {
+        // y: 50,
+        // opacity: 0,
+        // delay: 0.5,
+        // duration: 0.8,
+        // ease: "power3.out",
+        // stagger: 0.08,
+        // y: 120,
+        opacity: 0,
+        // duration: 1,
+        yPercent: 100,
+        duration: 2,
+        // ease: "power4.out",
+        ease: "power4.out",
+        // stagger: 0.05,
+        stagger: { amount: 2 },
+    });
+
+    /* SECTION TITLES */
+    sectionTitles.forEach((el) => {
+        const split = new SplitType(el, { types: "lines" });
+        gsap.from(split.lines, {
+            scrollTrigger: {
+                trigger: el,
+                start: "top 90%",
+                end: "top 40%",
+                scrub: 1.5,
+            },
+            y: 80,
+            opacity: 0,
+            duration: 0.9,
+            ease: "power4.out",
+            stagger: 0.15,
+        });
+    });
+};
+
+onMounted(() => {
+    initAnimations();
+});
+
+onBeforeUnmount(() => {
+    heroTitleSplit?.revert();
+    heroSubtitleSplit?.revert();
+});
 
 const categories = ref([
     { name: "Concert", icon: MusicalNoteIcon },
@@ -71,20 +158,38 @@ const steps = ref([
         <!-- Hero Section -->
         <div class="relative">
             <div
-                class="relative bg-gradient-to-b from-red-500 to-red-800 h-[80vh] sm:h-screen flex flex-col items-center justify-center text-white px-4 bg-cover bg-center"
-                :style="{
-                    backgroundImage: `url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-                }"
+                class="relative bg-gradient-to-b from-cyan-500 to-cyan-800 h-[80vh] sm:h-screen flex flex-col items-center justify-center text-white px-4 bg-cover bg-center"
             >
+                <!--  :style="{
+                    backgroundImage: `url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
+                }" -->
+                <video
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    class="absolute inset-0 w-full h-full object-cover"
+                >
+                    <source
+                        src="https://assets.mixkit.co/videos/48504/48504-720.mp4"
+                        type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                </video>
+
                 <div class="absolute inset-0 bg-black/45"></div>
 
                 <div class="relative z-10 text-center px-4 sm:px-8">
                     <h1
+                        ref="heroTitleRef"
                         class="text-4xl md:text-6xl font-extrabold text-white drop-shadow-lg"
                     >
                         Discover Events Near You
                     </h1>
-                    <p class="text-lg md:text-xl text-gray-200 mt-4 font-light">
+                    <p
+                        ref="heroSubtitleRef"
+                        class="text-lg md:text-xl text-gray-200 mt-4 font-light"
+                    >
                         Book tickets for concerts, sports, workshops,
                         conferences, and more.
                     </p>
@@ -124,7 +229,10 @@ const steps = ref([
 
         <!-- Categories Section -->
         <section class="py-16 mt-10 px-6 max-w-7xl mx-auto">
-            <h2 class="text-3xl font-bold mb-6 text-cyan-700">
+            <h2
+                class="text-3xl font-bold mb-6 text-cyan-700"
+                :ref="registerSectionTitle"
+            >
                 Popular Categories
             </h2>
             <hr />
@@ -176,11 +284,14 @@ const steps = ref([
         </section>
 
         <!-- ========================= -->
-        <!-- Featured Events -->
+        <!-- Featucyan Events -->
         <!-- ========================= -->
         <section class="pb-16 px-6 max-w-7xl mx-auto">
-            <h2 class="text-3xl font-bold mb-6 text-cyan-700">
-                Featured Events
+            <h2
+                class="text-3xl font-bold mb-6 text-cyan-700"
+                :ref="registerSectionTitle"
+            >
+                Featucyan Events
             </h2>
             <hr />
 

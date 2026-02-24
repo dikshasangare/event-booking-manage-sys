@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AdminTicketTypeController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminVenueController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Manager\ManagerBookingController;
 use App\Http\Controllers\Manager\ManagerEventController;
@@ -46,6 +47,7 @@ Route::get('/my-bookings', function () {
 })->name('my-bookings');
 
 Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
+Route::get('/event/{id}', [EventController::class, 'show'])->name('event.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
